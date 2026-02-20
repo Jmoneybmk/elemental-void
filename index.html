@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elemental Void: The Outsider's Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--void:#080608;--void-mid:#100c14;--void-surface:#16101e;--void-raised:#1e1628;--gold:#c9a84c;--gold-light:#efd87a;--gold-dim:#7a5e22;--gold-muted:#4a3a15;--blood:#6b1010;--blood-bright:#a01818;--blood-muted:#3d0a0a;--text:#d4c5a9;--text-dim:#8a7a60;--text-faint:#4a4030;--border:rgba(201,168,76,0.18);--border-bright:rgba(201,168,76,0.45);--radius:3px;--panel-pad:20px}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--void);color:var(--text);font-family:'Crimson Pro','IM Fell English',Georgia,serif;font-size:1.05rem;line-height:1.75;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 15% 50%,rgba(8,4,12,0) 0%,var(--void) 70%),radial-gradient(ellipse 40% 60% at 85% 30%,rgba(107,16,16,0.06) 0%,transparent 60%),radial-gradient(ellipse 30% 40% at 50% 80%,rgba(91,44,111,0.05) 0%,transparent 50%);pointer-events:none}
+body::after{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 55%,rgba(0,0,0,0.65) 100%);pointer-events:none}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--void-mid)}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:3px}
+
+#title-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--void);padding:40px 20px}
+#title-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(107,16,16,0.12) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 30% 70%,rgba(91,44,111,0.08) 0%,transparent 60%);pointer-events:none}
+.title-emblem{font-size:clamp(60px,10vw,120px);margin-bottom:20px;animation:ep 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(201,168,76,0.4))}
+@keyframes ep{0%,100%{filter:drop-shadow(0 0 20px rgba(201,168,76,0.3));transform:scale(1)}50%{filter:drop-shadow(0 0 50px rgba(201,168,76,0.6));transform:scale(1.03)}}
+.title-main{font-family:'Cinzel Decorative',serif;font-size:clamp(28px,5vw,58px);font-weight:900;color:var(--gold);text-shadow:0 0 40px rgba(201,168,76,0.5),0 2px 6px #000;letter-spacing:3px;text-align:center;line-height:1.2}
+.title-sub{font-family:'IM Fell English',serif;font-style:italic;color:var(--text-dim);font-size:clamp(14px,2vw,19px);letter-spacing:4px;margin:10px 0 40px;text-align:center}
+.title-divider{width:280px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:0 auto 40px}
+.title-warning{font-family:'Crimson Pro',serif;font-size:11px;letter-spacing:3px;color:var(--blood-bright);text-transform:uppercase;margin-bottom:40px;padding:6px 20px;border:1px solid var(--blood);border-radius:var(--radius);animation:wf 3s ease-in-out infinite}
+@keyframes wf{0%,90%,100%{opacity:1}95%{opacity:0.6}}
+.title-btn-group{display:flex;flex-direction:column;gap:12px;align-items:center;width:100%;max-width:320px}
+.title-btn{width:100%;padding:14px 32px;font-family:'Cinzel Decorative',serif;font-size:13px;letter-spacing:2px;border:1px solid var(--border-bright);background:transparent;color:var(--gold);cursor:pointer;border-radius:var(--radius);transition:all 0.25s;text-transform:uppercase}
+.title-btn:hover{background:rgba(201,168,76,0.08);border-color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,0.15);transform:translateY(-1px)}
+.title-btn.danger{border-color:rgba(160,24,24,0.5);color:#a05050}
+.title-btn.danger:hover{background:rgba(160,24,24,0.08);border-color:var(--blood-bright)}
+
+#game-screen{display:none;position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 16px 40px}
+#top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.top-bar-title{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--gold-dim);letter-spacing:2px}
+#arc-label{font-family:'IM Fell English',serif;font-style:italic;color:var(--text-dim);font-size:14px}
+.top-bar-actions{display:flex;gap:8px}
+.icon-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Crimson Pro',serif;font-size:12px;letter-spacing:1px;padding:6px 14px;cursor:pointer;border-radius:var(--radius);transition:all 0.2s}
+.icon-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+#main-grid{display:grid;grid-template-columns:1fr 280px;gap:20px}
+@media(max-width:768px){#main-grid{grid-template-columns:1fr}#side-panel{order:-1}}
+
+#story-panel{background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:var(--panel-pad);min-height:400px;position:relative}
+#story-panel::before,#story-panel::after{content:'';position:absolute;width:16px;height:16px;border-color:var(--gold-dim);border-style:solid}
+#story-panel::before{top:6px;left:6px;border-width:1px 0 0 1px}
+#story-panel::after{bottom:6px;right:6px;border-width:0 1px 1px 0}
+#location-display{font-family:'Cinzel Decorative',serif;font-size:11px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+#scene-text p{margin-bottom:12px;line-height:1.85}
+.scene-paragraph{animation:fsi 0.5s ease forwards;opacity:0}
+@keyframes fsi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.text-blood{color:var(--blood-bright);font-weight:600}
+.text-void{color:#a569bd;font-style:italic;opacity:0.85}
+.text-element{color:var(--gold-light);text-shadow:0 0 6px rgba(201,168,76,0.3)}
+em{color:var(--gold-light)}strong{color:var(--gold)}
+
+#choice-container{margin-top:24px;display:flex;flex-direction:column;gap:8px}
+.choice-btn{background:var(--void-surface);border:1px solid var(--border);color:var(--text);font-family:'Crimson Pro',serif;font-size:15px;padding:12px 16px;text-align:left;cursor:pointer;border-radius:var(--radius);transition:all 0.25s;line-height:1.5;animation:fsi 0.4s ease forwards;opacity:0}
+.choice-btn:hover{border-color:var(--gold-dim);background:rgba(201,168,76,0.06);transform:translateX(4px);color:var(--gold-light)}
+.choice-num{color:var(--gold-dim);font-weight:600;margin-right:6px}
+.choice-hint{display:block;font-size:12px;color:var(--text-faint);font-style:italic;margin-top:3px}
+
+#side-panel{display:flex;flex-direction:column;gap:12px}
+.visual-panel{width:100%;height:180px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;background:#000}
+.visual-panel canvas{width:100%;height:100%;display:block}
+#mood-title{position:absolute;bottom:0;left:0;right:0;text-align:center;padding:6px;font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;background:linear-gradient(transparent,rgba(0,0,0,0.7))}
+
+#stats-panel{background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:relative}
+#stats-panel::before{content:'STATUS';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--void-mid);padding:0 10px;font-family:'Cinzel Decorative',serif;font-size:9px;color:var(--gold-dim);letter-spacing:2px}
+#player-name-display{font-family:'Cinzel Decorative',serif;font-size:12px;color:var(--gold);letter-spacing:1px;margin-bottom:10px;text-align:center}
+.stat-row{display:grid;grid-template-columns:70px 1fr 40px;align-items:center;gap:6px;margin-bottom:5px}
+.stat-lbl{font-size:11px;letter-spacing:1px;color:var(--text-dim)}
+.stat-bar-wrap{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden;border:1px solid rgba(201,168,76,0.1)}
+.stat-bar{height:100%;border-radius:3px;transition:width 0.6s ease}
+.stat-bar.hp{background:linear-gradient(90deg,#6b1010,#a01818)}
+.stat-bar.mana{background:linear-gradient(90deg,#1a3a6b,#2980b9)}
+.stat-bar.str{background:linear-gradient(90deg,#6b4c2a,#a0784a)}
+.stat-bar.agi{background:linear-gradient(90deg,#1e6630,#27ae60)}
+.stat-bar.res{background:linear-gradient(90deg,#6b5a10,#c9a84c)}
+.stat-bar.cor{background:linear-gradient(90deg,#1a0533,#5b2c6f)}
+.stat-val{font-size:11px;color:var(--text-dim);text-align:right}
+
+#element-panel{background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:10px}
+#element-display{display:flex;gap:6px;flex-wrap:wrap}
+.element-badge{font-size:12px;padding:3px 8px;border:1px solid;border-radius:var(--radius)}
+.inv-empty{color:var(--text-faint);font-size:12px;font-style:italic}
+
+#inventory-panel{background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:10px;position:relative}
+#inventory-panel::before{content:'INVENTORY';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--void-mid);padding:0 8px;font-family:'Cinzel Decorative',serif;font-size:8px;color:var(--gold-dim);letter-spacing:2px}
+#inventory-bar{display:flex;gap:6px;flex-wrap:wrap;min-height:24px;align-items:center}
+.inv-item{background:var(--void-surface);border:1px solid var(--border);border-radius:var(--radius);padding:2px 8px;font-size:12px;color:var(--gold-light);display:flex;align-items:center;gap:4px}
+
+#battle-ui{display:none;background:var(--void-mid);border:2px solid var(--blood);border-radius:var(--radius);padding:16px;margin-top:16px}
+#battle-ui.active{display:block}
+.battle-header{text-align:center;font-family:'Cinzel Decorative',serif;color:var(--blood-bright);font-size:12px;letter-spacing:3px;margin-bottom:12px;animation:pr 2s infinite}
+@keyframes pr{0%,100%{color:var(--blood-bright)}50%{color:#ff5050}}
+.combatants{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:12px}
+.combatant-card{background:var(--void-surface);border:1px solid var(--border);padding:10px;border-radius:var(--radius);text-align:center}
+.combatant-name{font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:1px;color:var(--gold);margin-bottom:6px}
+.combatant-hp-bar{height:8px;background:rgba(0,0,0,0.5);border-radius:4px;overflow:hidden;border:1px solid rgba(201,168,76,0.2);margin-bottom:3px}
+.combatant-hp-fill{height:100%;background:linear-gradient(90deg,#6b1010,#c0392b);border-radius:4px;transition:width 0.5s ease}
+.combatant-hp-fill.enemy{background:linear-gradient(90deg,#3a0a6a,#7a2aaa)}
+.combatant-hp-text{font-size:12px;color:var(--text-dim)}
+.vs-symbol{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--blood);text-shadow:0 0 10px rgba(139,26,26,0.6)}
+.battle-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.battle-btn{background:var(--void-surface);border:1px solid var(--border);color:var(--text-dim);font-family:'Crimson Pro',serif;font-size:12px;padding:8px 4px;cursor:pointer;border-radius:var(--radius);transition:all 0.2s;text-align:center}
+.battle-btn:hover:not(:disabled){border-color:var(--gold-dim);color:var(--gold);background:rgba(201,168,76,0.06)}
+.battle-btn:disabled{opacity:0.3;cursor:not-allowed}
+#battle-log{background:var(--void);border:1px solid var(--border);border-radius:var(--radius);padding:8px;max-height:120px;overflow-y:auto;font-size:12px}
+.log-entry{padding:2px 0;color:var(--text-dim)}.log-hit{color:var(--gold-light)}.log-crit{color:var(--gold);font-weight:600}.log-magic{color:#74c5e8}.log-enemy{color:var(--blood-bright)}.log-miss{color:var(--text-faint);font-style:italic}
+
+#chargen-overlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(4,2,6,0.97);padding:20px}
+#chargen-overlay.active{display:flex}
+.chargen-box{width:100%;max-width:560px;background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:30px}
+.chargen-step{display:none}.chargen-step.active{display:block}
+.chargen-question{font-family:'IM Fell English',serif;font-size:17px;color:var(--text);margin-bottom:8px;line-height:1.6}
+.chargen-hint{font-size:13px;color:var(--text-faint);font-style:italic;margin-bottom:20px}
+.chargen-options{display:flex;flex-direction:column;gap:10px}
+.chargen-option{background:var(--void-surface);border:1px solid var(--border);color:var(--text);font-family:'Crimson Pro',serif;font-size:15px;padding:14px 16px;text-align:left;cursor:pointer;border-radius:var(--radius);transition:all 0.25s;line-height:1.5;display:flex;flex-direction:column;gap:2px}
+.chargen-option:hover{border-color:var(--gold-dim);background:rgba(201,168,76,0.06);transform:translateX(4px)}
+.chargen-option.selected{border-color:var(--gold);background:rgba(201,168,76,0.1)}
+.opt-letter{color:var(--gold-dim);font-weight:600;margin-right:6px}.opt-label{color:var(--text)}.opt-desc{font-size:12px;color:var(--text-faint);font-style:italic;margin-top:2px}
+.chargen-name-input{width:100%;padding:12px 16px;background:var(--void-surface);border:1px solid var(--border);color:var(--gold-light);font-family:'Cinzel Decorative',serif;font-size:16px;letter-spacing:2px;border-radius:var(--radius);outline:none;margin-bottom:16px;text-align:center}
+.chargen-name-input:focus{border-color:var(--gold-dim)}
+.chargen-name-input::placeholder{color:var(--text-faint)}
+.chargen-next-btn{display:block;width:100%;padding:12px;background:transparent;border:1px solid var(--gold-dim);color:var(--gold);font-family:'Cinzel Decorative',serif;font-size:13px;letter-spacing:2px;cursor:pointer;border-radius:var(--radius);transition:all 0.25s;text-transform:uppercase}
+.chargen-next-btn:hover{background:rgba(201,168,76,0.08);border-color:var(--gold)}
+.chargen-progress{display:flex;gap:8px;justify-content:center;margin-top:24px}
+.chargen-dot{width:8px;height:8px;border-radius:50%;background:var(--void-surface);border:1px solid var(--text-faint);transition:all 0.3s}
+.chargen-dot.active{background:var(--gold);border-color:var(--gold)}
+.chargen-dot.done{background:var(--gold-dim);border-color:var(--gold-dim)}
+
+#progress-overlay{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;background:rgba(4,2,6,0.95);padding:20px;overflow-y:auto}
+#progress-overlay.active{display:flex}
+.progress-box{width:100%;max-width:700px;background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:30px}
+.progress-title{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--gold);letter-spacing:3px;text-align:center;margin-bottom:24px}
+.arc-section{margin-bottom:24px}
+.arc-title{font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:4px}
+.arc-theme{font-size:12px;color:var(--text-faint);font-style:italic;margin-bottom:12px}
+.chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.chapter-node{background:var(--void-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:12px;color:var(--text-dim);line-height:1.4}
+.chapter-node.current{border-color:var(--gold);color:var(--gold-light);background:rgba(201,168,76,0.06)}
+.chapter-node.completed{border-color:var(--gold-dim);color:var(--gold-dim)}
+.chapter-node.locked{opacity:0.35}
+.chapter-num{display:block;font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:2px}
+.chapter-stub{font-size:10px;color:var(--text-faint)}
+.close-overlay-btn{display:block;margin:20px auto 0;padding:10px 30px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel Decorative',serif;font-size:12px;letter-spacing:2px;cursor:pointer;border-radius:var(--radius);transition:all 0.2s}
+.close-overlay-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+.notification{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-60px);z-index:999;padding:10px 24px;border-radius:var(--radius);font-size:13px;font-family:'Crimson Pro',serif;letter-spacing:1px;opacity:0;transition:all 0.4s ease;pointer-events:none;border:1px solid var(--border);background:var(--void-mid);color:var(--text-dim)}
+.notification.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.notification.success{border-color:rgba(39,174,96,0.5);color:#7dcea0}
+.notification.warning{border-color:rgba(201,168,76,0.5);color:var(--gold)}
+.notification.error{border-color:rgba(160,24,24,0.5);color:var(--blood-bright)}
+</style>
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="title-screen">
+  <div class="title-emblem">◯</div>
+  <div class="title-main">Elemental Void</div>
+  <div class="title-sub">The Outsider's Path</div>
+  <div class="title-divider"></div>
+  <div class="title-warning">Contains graphic violence · mature themes · 18+</div>
+  <div class="title-btn-group">
+    <button class="title-btn" id="btn-new-game">New Path</button>
+    <button class="title-btn" id="btn-continue">Continue</button>
+    <button class="title-btn" id="btn-progress">Chapter Map</button>
+    <button class="title-btn danger" id="btn-delete">Erase Save</button>
+  </div>
+</div>
+
+<!-- CHARGEN OVERLAY -->
+<div id="chargen-overlay">
+  <div class="chargen-box">
+    <div class="chargen-step active" id="step-1">
+      <div class="chargen-question">The void asks a question before it lets you through. It doesn't use words. You understand anyway.</div>
+      <div class="chargen-hint">What were you called?</div>
+      <input type="text" class="chargen-name-input" id="name-input" placeholder="Your name" maxlength="24" autocomplete="off">
+      <button class="chargen-next-btn" id="name-next">Continue</button>
+    </div>
+
+    <div class="chargen-step" id="step-2">
+      <div class="chargen-question">Before the fall, before all of this — what were you?</div>
+      <div class="chargen-hint">Your past shapes what survives.</div>
+      <div class="chargen-options" id="origin-options">
+        <button class="chargen-option" data-value="soldier">
+          <span class="opt-label"><span class="opt-letter">A.</span> Something with a uniform and orders you stopped questioning.</span>
+          <span class="opt-desc">Strong. Disciplined. Carries weight.</span>
+        </button>
+        <button class="chargen-option" data-value="scholar">
+          <span class="opt-label"><span class="opt-letter">B.</span> Someone who lived in their head more than their body.</span>
+          <span class="opt-desc">Sharp mind. Fragile frame. Unbreakable focus.</span>
+        </button>
+        <button class="chargen-option" data-value="criminal">
+          <span class="opt-label"><span class="opt-letter">C.</span> Someone who learned early that rules are suggestions with enforcement problems.</span>
+          <span class="opt-desc">Quick hands. Quicker exits. Flexible morals.</span>
+        </button>
+        <button class="chargen-option" data-value="survivor">
+          <span class="opt-label"><span class="opt-letter">D.</span> Someone who's already been through something that should have killed them.</span>
+          <span class="opt-desc">Balanced. Scarred. Hard to surprise.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chargen-step" id="step-3">
+      <div class="chargen-question">A building is on fire. There are people inside. You have seconds.</div>
+      <div class="chargen-hint">Your soul answers before your mind does.</div>
+      <div class="chargen-options" id="soul1-options">
+        <button class="chargen-option" data-value="charge">
+          <span class="opt-label"><span class="opt-letter">A.</span> You go in. Right now. Thinking takes too long when people are burning.</span>
+        </button>
+        <button class="chargen-option" data-value="calculate">
+          <span class="opt-label"><span class="opt-letter">B.</span> You assess the structure. Find the weakest entry. Three seconds of thought saves lives.</span>
+        </button>
+        <button class="chargen-option" data-value="organize">
+          <span class="opt-label"><span class="opt-letter">C.</span> You start shouting directions. Coordinate the people already here. Multiply the effort.</span>
+        </button>
+        <button class="chargen-option" data-value="observe">
+          <span class="opt-label"><span class="opt-letter">D.</span> You watch. You note the exits. You wait for the moment where intervention actually changes the outcome.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chargen-step" id="step-4">
+      <div class="chargen-question">You've captured someone who knows where three hostages are being held. They're not talking. The clock is running out.</div>
+      <div class="chargen-hint">There is no clean answer. There never is.</div>
+      <div class="chargen-options" id="soul2-options">
+        <button class="chargen-option" data-value="mercy">
+          <span class="opt-label"><span class="opt-letter">A.</span> You give them your word: cooperate, and they walk free. And you mean it.</span>
+        </button>
+        <button class="chargen-option" data-value="bargain">
+          <span class="opt-label"><span class="opt-letter">B.</span> You get the information first. Then you decide. Trust is earned, not granted.</span>
+        </button>
+        <button class="chargen-option" data-value="execute">
+          <span class="opt-label"><span class="opt-letter">C.</span> You end it. Some debts don't get negotiated. You'll find another way to save those people.</span>
+        </button>
+        <button class="chargen-option" data-value="torture">
+          <span class="opt-label"><span class="opt-letter">D.</span> You take your time. The information can wait a few minutes.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chargen-step" id="step-5">
+      <div class="chargen-question">You're cornered. Three against one, and these people know what they're doing. Your first move is—</div>
+      <div class="chargen-hint">Your body answers before your mind does.</div>
+      <div class="chargen-options" id="instinct-options">
+        <button class="chargen-option" data-value="aggressive">
+          <span class="opt-label"><span class="opt-letter">A.</span> Close the distance fast. Hit before they're ready.</span>
+          <span class="opt-desc">Pain is temporary. Initiative is everything.</span>
+        </button>
+        <button class="chargen-option" data-value="defensive">
+          <span class="opt-label"><span class="opt-letter">B.</span> Ground yourself. Let them come. Read their movements.</span>
+          <span class="opt-desc">Patience kills faster than rage.</span>
+        </button>
+        <button class="chargen-option" data-value="tactical">
+          <span class="opt-label"><span class="opt-letter">C.</span> Find the terrain advantage. Make the numbers irrelevant.</span>
+          <span class="opt-desc">Smarter, not harder.</span>
+        </button>
+        <button class="chargen-option" data-value="adaptive">
+          <span class="opt-label"><span class="opt-letter">D.</span> Watch the first second. Everything you need to know is in how they move.</span>
+          <span class="opt-desc">Style is a luxury. Survival is the only rule.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chargen-step" id="step-6">
+      <div class="chargen-question" style="text-align:center;margin-bottom:20px;">The void has heard you.</div>
+      <div id="chargen-summary" style="background:var(--void);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;font-size:14px;line-height:1.8;color:var(--text-dim);"></div>
+      <button class="chargen-next-btn" id="begin-btn">Enter Eldara</button>
+    </div>
+
+    <div class="chargen-progress">
+      <div class="chargen-dot active"></div>
+      <div class="chargen-dot"></div>
+      <div class="chargen-dot"></div>
+      <div class="chargen-dot"></div>
+      <div class="chargen-dot"></div>
+      <div class="chargen-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS OVERLAY -->
+<div id="progress-overlay">
+  <div class="progress-box">
+    <div class="progress-title">The Outsider's Path</div>
+    <div class="arc-section">
+      <div class="arc-title">Arc I — Blood and Awakening</div>
+      <div class="arc-theme">"A broken world does not care that you are lost."</div>
+      <div class="chapter-grid" id="arc1-grid"></div>
+    </div>
+    <div class="arc-section">
+      <div class="arc-title">Arc II — The Shadow Circle</div>
+      <div class="arc-theme">"In the pits below Veridia, survival is the only currency."</div>
+      <div class="chapter-grid" id="arc2-grid"></div>
+    </div>
+    <div class="arc-section">
+      <div class="arc-title">Arc III — The Weight of Elements</div>
+      <div class="arc-theme">"Power without cost is a lie. Power with cost is war."</div>
+      <div class="chapter-grid" id="arc3-grid"></div>
+    </div>
+    <button class="close-overlay-btn" id="close-progress">Close</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <div id="top-bar">
+    <div class="top-bar-title">Elemental Void</div>
+    <div id="arc-label">Arc 1 · Chapter 1</div>
+    <div class="top-bar-actions">
+      <button class="icon-btn" id="btn-map">Map</button>
+      <button class="icon-btn" id="btn-save">Save</button>
+      <button class="icon-btn" id="btn-menu">Menu</button>
+    </div>
+  </div>
+
+  <div id="main-grid">
+    <div id="story-panel">
+      <div id="location-display">Unknown</div>
+      <div id="scene-text"></div>
+      <div id="choice-container"></div>
+      <!-- Battle UI lives inside story panel -->
+      <div id="battle-ui">
+        <div class="battle-header">⚔ COMBAT ⚔</div>
+        <div class="combatants">
+          <div class="combatant-card">
+            <div class="combatant-name" id="player-battle-name">YOU</div>
+            <div class="combatant-hp-bar"><div class="combatant-hp-fill" id="player-hp-bar" style="width:100%"></div></div>
+            <div class="combatant-hp-text">HP: <span id="player-hp-disp">100</span></div>
+          </div>
+          <div class="vs-symbol">⚔</div>
+          <div class="combatant-card">
+            <div class="combatant-name" id="enemy-name-disp">ENEMY</div>
+            <div class="combatant-hp-bar"><div class="combatant-hp-fill enemy" id="enemy-hp-bar" style="width:100%"></div></div>
+            <div class="combatant-hp-text">HP: <span id="enemy-hp-disp">50</span></div>
+          </div>
+        </div>
+        <div class="battle-actions" id="battle-actions-box"></div>
+        <div id="battle-log"></div>
+      </div>
+    </div>
+
+    <div id="side-panel">
+      <div class="visual-panel">
+        <canvas id="scene-canvas"></canvas>
+        <div id="mood-title"></div>
+      </div>
+
+      <div id="stats-panel">
+        <div id="player-name-display"></div>
+        <div class="stat-row"><div class="stat-lbl">Vitality</div><div class="stat-bar-wrap"><div class="stat-bar hp" id="bar-hp" style="width:100%"></div></div><div class="stat-val" id="val-hp">100</div></div>
+        <div class="stat-row"><div class="stat-lbl">Mana</div><div class="stat-bar-wrap"><div class="stat-bar mana" id="bar-mana" style="width:100%"></div></div><div class="stat-val" id="val-mana">80</div></div>
+        <div class="stat-row"><div class="stat-lbl">Strength</div><div class="stat-bar-wrap"><div class="stat-bar str" id="bar-str" style="width:10%"></div></div><div class="stat-val" id="val-str">10</div></div>
+        <div class="stat-row"><div class="stat-lbl">Agility</div><div class="stat-bar-wrap"><div class="stat-bar agi" id="bar-agi" style="width:10%"></div></div><div class="stat-val" id="val-agi">10</div></div>
+        <div class="stat-row"><div class="stat-lbl">Resolve</div><div class="stat-bar-wrap"><div class="stat-bar res" id="bar-res" style="width:10%"></div></div><div class="stat-val" id="val-res">10</div></div>
+        <div class="stat-row"><div class="stat-lbl">Corruption</div><div class="stat-bar-wrap"><div class="stat-bar cor" id="bar-cor" style="width:0%"></div></div><div class="stat-val" id="val-cor">0</div></div>
+      </div>
+
+      <div id="element-panel">
+        <div id="element-display"><span class="inv-empty">No affinity yet</span></div>
+      </div>
+
+      <div id="inventory-panel">
+        <div id="inventory-bar"><span class="inv-empty">— empty —</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="notification" class="notification"></div>
+
+<!-- SCRIPTS — order matters -->
+<script src="engine.js"></script>
+<script src="chargen.js"></script>
+<script src="progress.js"></script>
+<!-- Chapter files register themselves via EV.registerChapter() -->
+<script src="Arc I — Blood and Awakening/chapter1.js"></script>
+
+<script>
+// ── TITLE SCREEN WIRING ──────────────────────────────────
+document.getElementById('btn-new-game').addEventListener('click', () => {
+  // Reset state completely for new game
+  EV.deleteSave(true);
+  // Reset chargen UI to step 1
+  document.querySelectorAll('.chargen-step').forEach(el => el.classList.remove('active'));
+  document.getElementById('step-1').classList.add('active');
+  document.querySelectorAll('.chargen-dot').forEach((d,i) => {
+    d.classList.remove('active','done');
+    if(i===0) d.classList.add('active');
+  });
+  document.getElementById('name-input').value = '';
+  document.querySelectorAll('.chargen-option').forEach(b => b.classList.remove('selected'));
+  document.getElementById('chargen-overlay').classList.add('active');
+  EV.showNotification('Starting new path...', 'info');
+});
+
+document.getElementById('btn-continue').addEventListener('click', () => {
+  if (EV.load()) {
+    EV.hideTitleScreen();
+    EV.initCanvas();
+    EV.loadChapter(EV.state.currentArc, EV.state.currentChapter, EV.state.currentScene);
+    EV.renderStats();
+    EV.renderInventory();
+  }
+});
+
+document.getElementById('btn-progress').addEventListener('click', () => {
+  PROGRESS.render();
+  document.getElementById('progress-overlay').classList.add('active');
+});
+
+document.getElementById('btn-delete').addEventListener('click', () => {
+  if (confirm('Erase your save? This cannot be undone.')) {
+    EV.deleteSave(true);
+  }
+});
+
+// ── IN-GAME BUTTONS ──────────────────────────────────────
+document.getElementById('btn-save').addEventListener('click', () => EV.save());
+
+document.getElementById('btn-map').addEventListener('click', () => {
+  PROGRESS.render();
+  document.getElementById('progress-overlay').classList.add('active');
+});
+
+document.getElementById('btn-menu').addEventListener('click', () => {
+  if (confirm('Return to main menu?')) {
+    EV.showTitleScreen();
+  }
+});
+
+document.getElementById('close-progress').addEventListener('click', () => {
+  document.getElementById('progress-overlay').classList.remove('active');
+});
+</script>
+</body>
+</html>
