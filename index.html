@@ -144,6 +144,11 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
 .chapter-node.locked{opacity:0.35}
 .chapter-num{display:block;font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:2px}
 .chapter-stub{font-size:10px;color:var(--text-faint)}
+.arc-coming-soon{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px 16px;border:1px dashed var(--border);border-radius:var(--radius);background:rgba(201,168,76,0.02)}
+.coming-soon-icon{font-size:20px;color:var(--gold-dim);opacity:0.5;animation:cs-pulse 3s ease-in-out infinite}
+.coming-soon-text{font-family:'Cinzel Decorative',serif;font-size:12px;color:var(--gold-dim);letter-spacing:3px;text-transform:uppercase}
+.coming-soon-sub{font-size:11px;color:var(--text-faint);font-style:italic}
+@keyframes cs-pulse{0%,100%{opacity:0.3}50%{opacity:0.7}}
 .close-overlay-btn{display:block;margin:20px auto 0;padding:10px 30px;background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel Decorative',serif;font-size:12px;letter-spacing:2px;cursor:pointer;border-radius:var(--radius);transition:all 0.2s}
 .close-overlay-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
 
@@ -296,11 +301,6 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
       <div class="arc-theme">"In the pits below Veridia, survival is the only currency."</div>
       <div class="chapter-grid" id="arc2-grid"></div>
     </div>
-    <div class="arc-section">
-      <div class="arc-title">Arc III — The Weight of Elements</div>
-      <div class="arc-theme">"Power without cost is a lie. Power with cost is war."</div>
-      <div class="chapter-grid" id="arc3-grid"></div>
-    </div>
     <button class="close-overlay-btn" id="close-progress">Close</button>
   </div>
 </div>
@@ -373,11 +373,12 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
 <div id="notification" class="notification"></div>
 
 <!-- SCRIPTS — order matters -->
-<script src="engine.js"></script>
-<script src="chargen.js"></script>
-<script src="progress.js"></script>
+<script src="engine.js?v=1771661385"></script>
+<script src="chargen.js?v=1771661385"></script>
+<script src="progress.js?v=1771661385"></script>
 <!-- Chapter files register themselves via EV.registerChapter() -->
-<script src="Arc I — Blood and Awakening/chapter1.js"></script>
+<script src="Arc I — Blood and Awakening/chapter1.js?v=1771661385"></script>
+<script src="Arc I — Blood and Awakening/chapter2.js?v=1771662300"></script>
 
 <script>
 // ── TITLE SCREEN WIRING ──────────────────────────────────

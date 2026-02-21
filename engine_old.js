@@ -354,14 +354,14 @@ const EV = (() => {
 
   // ── NAVIGATION ─────────────────────────────────────────────
   function navigateTo(target) {
-    if(typeof target==='object'){api.renderScene(target);return;}
+    if(typeof target==='object'){renderScene(target);return;}
     const parts=target.split('/');
     if(parts.length===3){
       const arcNum=parseInt(parts[0].replace('arc',''));
       const chNum=parseInt(parts[1].replace('chapter',''));
       loadChapter(arcNum,chNum,parts[2]);
     } else if(parts.length===1){
-      if(chapterData&&chapterData[target]){api.renderScene(chapterData[target]);}
+      if(chapterData&&chapterData[target]){renderScene(chapterData[target]);}
       else{showNotification('Scene missing: '+target,'error');}
     }
   }
@@ -373,7 +373,7 @@ const EV = (() => {
     chapterData=data;
     const scene=startScene||Object.keys(chapterData)[0];
     state.currentScene=scene;
-    if(chapterData[scene])api.renderScene(chapterData[scene]);
+    if(chapterData[scene])renderScene(chapterData[scene]);
     else showNotification('Scene not found: '+scene,'error');
   }
 
@@ -722,7 +722,7 @@ const EV = (() => {
   function showTitleScreen(){document.getElementById('title-screen').style.display='flex';document.getElementById('game-screen').style.display='none';}
   function hideTitleScreen(){document.getElementById('title-screen').style.display='none';document.getElementById('game-screen').style.display='block';}
 
-  const api = {
+  return {
     state,ELEMENTS,CHAPTERS,
     registerChapter,
     save,load,deleteSave,hasSave,
@@ -737,6 +737,4 @@ const EV = (() => {
     initCanvas,drawScene,resizeCanvas,
     startBattle,endBattle,logBattle,battleAction,battleElementAttack,
   };
-
-  return api;
 })();

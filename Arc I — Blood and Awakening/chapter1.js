@@ -432,9 +432,9 @@ They circle. You plant your feet.`,
     location: 'Whispering Woods',
     scene: 'battle',
     moodLabel: 'Combat',
-    text: `The shadows circle.`,
+    text: `The shadows circle. You grip your weapon and prepare.`,
     effects: { setFlag: { shadow_battle_1_started: true } },
-    choices: [ { text: '[ Continue after battle ]', next: 'post_shadow_battle_1' } ],
+    choices: [],
   },
 
   tank_shadow_1: {

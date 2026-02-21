@@ -1,6 +1,6 @@
 // ============================================================
 // ELEMENTAL VOID — PROGRESS.JS
-// Chapter map renderer — 3 arcs, 10 chapters each
+// Chapter map renderer — Arc I active, Arc II coming soon
 // ============================================================
 
 const PROGRESS = (() => {
@@ -25,6 +25,7 @@ const PROGRESS = (() => {
     2: {
       title: 'Arc II — The Shadow Circle',
       theme: '"In the pits below Veridia, survival is the only currency."',
+      comingSoon: true,
       chapters: [
         { num: 1,  title: 'Veridia' },
         { num: 2,  title: 'The Academy of Elements' },
@@ -38,22 +39,6 @@ const PROGRESS = (() => {
         { num: 10, title: 'The Champion\'s Price' },
       ]
     },
-    3: {
-      title: 'Arc III — The Weight of Elements',
-      theme: '"Power without cost is a lie. Power with cost is war."',
-      chapters: [
-        { num: 1,  title: 'The Aetherian Signal' },
-        { num: 2,  title: 'War Drums' },
-        { num: 3,  title: 'Secondary Mastery' },
-        { num: 4,  title: 'Aldarion\'s Shadow' },
-        { num: 5,  title: 'The Tertiary Path' },
-        { num: 6,  title: 'The Hidden Kingdom' },
-        { num: 7,  title: 'Aetheria' },
-        { num: 8,  title: 'Queen Elysia\'s Court' },
-        { num: 9,  title: 'The Convergence Warning' },
-        { num: 10, title: 'The Void Between Worlds' },
-      ]
-    }
   };
 
   function render() {
@@ -61,6 +46,19 @@ const PROGRESS = (() => {
       const grid = document.getElementById(`arc${arcNum}-grid`);
       if (!grid) return;
       grid.innerHTML = '';
+
+      // Coming soon arc — show banner instead of chapter nodes
+      if (arc.comingSoon) {
+        const banner = document.createElement('div');
+        banner.className = 'arc-coming-soon';
+        banner.innerHTML = `
+          <span class="coming-soon-icon">◈</span>
+          <span class="coming-soon-text">Coming Soon</span>
+          <span class="coming-soon-sub">${arc.chapters.length} chapters planned</span>
+        `;
+        grid.appendChild(banner);
+        return;
+      }
 
       arc.chapters.forEach(ch => {
         const node = document.createElement('div');
