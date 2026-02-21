@@ -10,16 +10,9 @@ const PROGRESS = (() => {
       title: 'Arc I — Blood and Awakening',
       theme: '"A broken world does not care that you are lost."',
       chapters: [
-        { num: 1,  title: 'The Void Opens' },
-        { num: 2,  title: 'The Whispering Woods' },
-        { num: 3,  title: 'Elmridge — What Survives' },
-        { num: 4,  title: 'The First Blood' },
-        { num: 5,  title: 'Crimson Guard' },
-        { num: 6,  title: 'The Price of Fire' },
-        { num: 7,  title: 'Reflection Lake' },
-        { num: 8,  title: 'The Mountain Path' },
-        { num: 9,  title: 'Sanctuary' },
-        { num: 10, title: 'Awakening' },
+        { num: 1,  title: 'The Crossing' },
+        { num: 2,  title: 'Blood and Shelter' },
+        { num: 3,  title: 'The Blackwood Road' },
       ]
     },
     2: {
@@ -27,16 +20,7 @@ const PROGRESS = (() => {
       theme: '"In the pits below Veridia, survival is the only currency."',
       comingSoon: true,
       chapters: [
-        { num: 1,  title: 'Veridia' },
-        { num: 2,  title: 'The Academy of Elements' },
-        { num: 3,  title: 'Beneath the Surface' },
-        { num: 4,  title: 'First Bout' },
-        { num: 5,  title: 'The Void Walker\'s Name' },
-        { num: 6,  title: 'Secondary Resonance' },
-        { num: 7,  title: 'Blood and Gold' },
-        { num: 8,  title: 'The Codex Fragment' },
-        { num: 9,  title: 'Betrayal Below' },
-        { num: 10, title: 'The Champion\'s Price' },
+        { num: 1,  title: 'To Be Announced...' },
       ]
     },
   };
@@ -54,7 +38,7 @@ const PROGRESS = (() => {
         banner.innerHTML = `
           <span class="coming-soon-icon">◈</span>
           <span class="coming-soon-text">Coming Soon</span>
-          <span class="coming-soon-sub">${arc.chapters.length} chapters planned</span>
+          <span class="coming-soon-sub">Stay tuned</span>
         `;
         grid.appendChild(banner);
         return;
