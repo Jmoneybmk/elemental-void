@@ -16,8 +16,8 @@ const PROGRESS = (() => {
       ]
     },
     2: {
-      title: 'Arc II — To be Announced...',
-      theme: '"In the pits below Veridia, survival is the only currency."',
+      title: 'Arc II — To Be Determined...',
+      theme: '"Coming Soon..."',
       comingSoon: true,
       chapters: [
         { num: 1,  title: 'To Be Announced...' },
