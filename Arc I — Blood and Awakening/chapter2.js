@@ -1,5 +1,5 @@
 // ============================================================
-// ARC 1 · CHAPTER 2 — "The Whispering Woods"
+// ARC 1 · CHAPTER 2 — "The Shadow Circle"
 // Player arrives at Elmridge, meets Elder Mara, integrates.
 // Branches from Chapter 1:
 //   mara_meeting        — standard arrival (most paths)
