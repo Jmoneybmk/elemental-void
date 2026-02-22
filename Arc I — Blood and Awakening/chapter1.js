@@ -903,30 +903,258 @@ Forest becomes scrubland. Ridge of exposed granite. A view.`,
     moodLabel: 'Into the Dark',
     text: `You go south. Every instinct screams against it.
 
-Air colder. Moss dims. Shadows multiply — three, five, too many. They don't attack. Escorting.
+Air colder. Moss dims. The forest canopy closes overhead — not growing, *reaching*. Branches interlocking like fingers.
 
-[blood]Trees here are dead. Standing, petrified, bark turned to black glass. The Hollow's territory. Reality gave up and let it have what it wants.[/blood]
+[blood]The shadows appear almost immediately. Two of them, low to the ground, circling. Testing.[/blood]
 
-The shadows herd you toward a dead clearing — black soil, petrified trees, an absence at center.
-
-The Hollow stands there. In its territory, it's *solid* — tall, terribly proportioned, that smooth face turned toward you with absolute calm.
-
-The shadows form a ring. You're inside. With it.
-
-[void]It speaks your name. {PLAYER_NAME}. Not fragments this time — fluid, natural, stolen from your own throat.[/void]
-
-It opens its arms. An invitation.
-
-The optional part was five minutes ago.`,
+The deeper you go, the more territory belongs to the Hollow. These shadows aren't scouts. They're the first line of defense.`,
     effects: { setFlag: { entered_hollow_territory: true } },
-    choices: [ { text: '[ Fight The Hollow ]', next: 'hollow_boss_fight' } ],
+    choices: [ { text: '[ Fight: Hollow Shadows ]', next: 'south_shadow_battle_1' } ],
+  },
+
+  south_shadow_battle_1: {
+    location: 'Whispering Woods — Southern Depths',
+    scene: 'battle',
+    moodLabel: 'COMBAT',
+    text: `Two shadows converge. Cold static and wrong geometry.`,
+    effects: { setFlag: { south_shadow_1_started: true } },
+    choices: [],
+  },
+
+  south_shadow_1_win: {
+    location: 'Whispering Woods — Southern Depths',
+    scene: 'dark',
+    moodLabel: 'Deeper',
+    text: `The shadows break apart. Fragments of cold dissolving into nothing.
+
+[void]Your hands are numb. Breath comes ragged. But you're standing, and the path south is clear — for now.[/void]
+
+The forest is worse here. Trees petrified, bark turned to black glass. The moss is dead. The air tastes metallic.
+
+Deeper in: more movement. Shadows coalescing in the darkness ahead. Bigger than the pair you just fought.`,
+    effects: { resolve: 1 },
+    choices: [
+      { text: 'Continue deeper. You\'ve come this far.', next: 'south_approach_2' },
+      { text: 'Turn back. This was a mistake.', next: 'south_retreat_1' },
+    ]
+  },
+
+  south_shadow_1_lose: {
+    location: 'Whispering Woods — Southern Depths',
+    scene: 'dark',
+    moodLabel: 'Staggered',
+    text: `[blood]You go down. The cold tears through you — not cutting, *erasing*. Warmth leaving in waves.[/blood]
+
+Vision greys. The shadows circle, probing, but don't finish you. Something deeper calls them back. The Hollow wants you alive — or at least, it wants you to come *closer*.
+
+You drag yourself upright. Damaged, drained, but breathing.`,
+    effects: { hp: -10 },
+    choices: [
+      { text: 'Keep going. Spite is a fuel source.', next: 'south_approach_2' },
+      { text: 'Fall back. You can barely stand.', next: 'south_retreat_1' },
+    ]
+  },
+
+  south_retreat_1: {
+    location: 'Whispering Woods — Clearing Edge',
+    scene: 'dark',
+    moodLabel: 'Retreat',
+    text: `You turn north. The shadows don't pursue — they watch, patient, as you leave their territory.
+
+The clearing's light welcomes you back. Safety. The serpent's territory.
+
+[void]South is still there. The Hollow is still there. But for now, choosing survival is enough.[/void]`,
+    choices: [
+      { text: 'Dawn approaches. Choose your path.', next: 'dawn_approaches' },
+    ]
+  },
+
+  south_approach_2: {
+    location: 'Whispering Woods — Hollow\'s Outer Ring',
+    scene: 'hollow',
+    moodLabel: 'The Ring',
+    text: `Deeper. The petrified trees form a corridor — natural? Constructed? Impossible to tell. The bark reflects your movement in its glassy surface, but the reflections are wrong. Delayed by half a second. Showing where you were, not where you are.
+
+[blood]Three shadows this time. Larger, denser. The cold radiating from them fogs your breath. One makes a sound — low, grinding, like stone on stone.[/blood]
+
+They're not testing anymore. They're guarding.`,
+    choices: [ { text: '[ Fight: 3 Hollow Shadows ]', next: 'south_shadow_battle_2' } ],
+  },
+
+  south_shadow_battle_2: {
+    location: 'Whispering Woods — Hollow\'s Outer Ring',
+    scene: 'battle',
+    moodLabel: 'COMBAT',
+    text: `Three shadows. Tighter formation. They've learned from the last pair.`,
+    effects: { setFlag: { south_shadow_2_started: true } },
+    choices: [],
+  },
+
+  south_shadow_2_win: {
+    location: 'Whispering Woods — Hollow\'s Outer Ring',
+    scene: 'dark',
+    moodLabel: 'Bloodied',
+    text: `Three down. Your body is a catalog of damage — cold burns, numb extremities, mana draining faster than it should.
+
+[void]The forest opens ahead into a dead clearing — black soil, petrified trees, and at the center: a presence. An absence. The Hollow's domain.[/void]
+
+But between here and there: one more ring of shadows. You can see them forming in the dark — four shapes, the largest you've encountered. The Hollow's last line.`,
+    effects: { resolve: 1 },
+    choices: [
+      { text: 'Push through. No stopping now.', next: 'south_approach_3' },
+      { text: 'Turn back. You\'ve proven enough.', next: 'south_retreat_2' },
+    ]
+  },
+
+  south_shadow_2_lose: {
+    location: 'Whispering Woods — Hollow\'s Outer Ring',
+    scene: 'dark',
+    moodLabel: 'Broken',
+    text: `[blood]Too many. The cold takes you down — three sources of freezing dissolution hammering through your guard. You hit the ground hard.[/blood]
+
+Again, they don't finish you. Again, the Hollow calls them off. It wants you to come willingly. It wants you to *choose* this.
+
+You lie in dead soil, gasping, everything hurting past pain into numbness.`,
+    effects: { hp: -15 },
+    choices: [
+      { text: 'Get up. Keep going. You didn\'t come here to quit.', next: 'south_approach_3' },
+      { text: 'Crawl back. This is suicide.', next: 'south_retreat_2' },
+    ]
+  },
+
+  south_retreat_2: {
+    location: 'Whispering Woods — Clearing Edge',
+    scene: 'dark',
+    moodLabel: 'Wisdom',
+    text: `You retreat. Past the glassy trees, past the dead moss, back toward the serpent's territory. The shadows watch you leave with something that might be disappointment.
+
+[void]You fought deeper than anyone should. Two waves of shadows, and you're still breathing. That counts.
+
+The Hollow is patient. So are you.[/void]`,
+    effects: { resolve: 1 },
+    choices: [
+      { text: 'Return to the clearing. Choose another path.', next: 'dawn_approaches' },
+    ]
+  },
+
+  south_approach_3: {
+    location: 'Whispering Woods — Hollow\'s Inner Ring',
+    scene: 'hollow',
+    moodLabel: 'Final Guard',
+    text: `Four shadows. The largest ripples with static — almost humanoid, almost solid. A lieutenant, if shadows have rank.
+
+[blood]They form a wall between you and the clearing. This is it — the last barrier before the Hollow itself.[/blood]
+
+Behind them: dead ground, dead air, dead everything. And the Hollow, waiting with infinite patience.`,
+    choices: [ { text: '[ Fight: 4 Hollow Shadows ]', next: 'south_shadow_battle_3' } ],
+  },
+
+  south_shadow_battle_3: {
+    location: 'Whispering Woods — Hollow\'s Inner Ring',
+    scene: 'battle',
+    moodLabel: 'COMBAT',
+    text: `Four shadows. The inner guard. They attack as one.`,
+    effects: { setFlag: { south_shadow_3_started: true } },
+    choices: [],
+  },
+
+  south_shadow_3_win: {
+    location: 'Whispering Woods — Hollow\'s Inner Ring',
+    scene: 'dark',
+    moodLabel: 'Through',
+    text: `[blood]Four down. You're shaking — not from cold anymore, from everything. Mana low. Body running on adrenaline and something deeper.[/blood]
+
+The path to the Hollow is open. Dead clearing, fifty meters ahead.
+
+Then you notice something. To your left — growing from the base of a petrified tree, somehow alive in this dead zone — small glowing formations. Pale blue-green, luminescent, shaped like mushrooms but pulsing with a slow rhythm. Like breathing.
+
+[element]Elemental resonance. Faint but unmistakable. These things are *storing* ambient energy — the last living things in the Hollow's territory, surviving by absorbing what it radiates.[/element]
+
+Three choices. The Hollow waits. These mushrooms glow. And the way back is still clear.`,
+    effects: { resolve: 1 },
+    choices: [
+      { text: 'Continue to the Hollow. Finish this.', next: 'hollow_boss_fight' },
+      { text: 'Investigate the mushrooms. They\'re alive — that means something.', next: 'mushroom_heal' },
+      { text: 'Turn back. Three shadow fights is enough proof.', next: 'south_retreat_3' },
+    ]
+  },
+
+  south_shadow_3_lose: {
+    location: 'Whispering Woods — Hollow\'s Inner Ring',
+    scene: 'dark',
+    moodLabel: 'Broken',
+    text: `Four was too many. You're on the ground, vision tunneling, cold in your bones.
+
+[blood]The shadows disperse. Not because you won — because the Hollow dismissed them. It wants you now. Directly.[/blood]
+
+Through fading vision: glowing shapes at the base of a nearby tree. Mushrooms, pulsing with pale blue-green light. Alive in this dead place.
+
+And ahead: the clearing. The Hollow. Waiting.`,
+    effects: { hp: -20 },
+    choices: [
+      { text: 'Drag yourself to the mushrooms. Something alive might help.', next: 'mushroom_heal' },
+      { text: 'Crawl toward the Hollow. You\'re here. Finish it.', next: 'hollow_boss_fight' },
+      { text: 'Crawl back. Retreat.', next: 'south_retreat_3' },
+    ]
+  },
+
+  mushroom_heal: {
+    location: 'Whispering Woods — Hollow\'s Inner Ring',
+    scene: 'serpent',
+    moodLabel: 'The Living',
+    text: `The mushrooms pulse as you approach — responding to your presence, or your element, or simply to something alive entering their space.
+
+You touch one. Warmth floods your hand — not heat, *life*. Pure elemental energy, unfiltered, stored in these small organisms like batteries.
+
+[element]The energy transfers. Your body drinks it — mana channels opening, wounds knitting, the cold receding from your extremities. Not fully healed, but *restored*. Enough to fight.[/element]
+
+The mushrooms dim. Spent. Whatever they stored, they gave it to you. The last living things in the Hollow's territory, sacrificing their reserves for a stranger.
+
+[void]The Hollow's clearing is ahead. You're as ready as you'll ever be.[/void]`,
+    effects: { hp: 40, mana: 30, setFlag: { mushroom_healed: true } },
+    choices: [
+      { text: '[ Face The Hollow ]', next: 'hollow_boss_fight' },
+    ]
+  },
+
+  south_retreat_3: {
+    location: 'Whispering Woods — Hollow\'s Perimeter',
+    scene: 'hollow',
+    moodLabel: 'The Cost of Leaving',
+    text: `You turn to leave. The dead clearing is behind you. Freedom ahead.
+
+[blood]The Hollow disagrees.[/blood]
+
+A pulse — not physical, not elemental. Something *between*. It hits your back like a wall of freezing water. Your vision inverts. Colors bleed. The Hollow's attention, focused entirely on you, and it is *angry*.
+
+[void]Not at your defiance. At your wasted potential. You came this far. You fought through its guards. And now you're leaving.[/void]
+
+The pressure slams you forward, drives you to your knees. Cold burns across your spine — not a wound, a *mark*. The Hollow branding you as you flee its territory.
+
+You crawl north. Through the glassy trees, past the dead moss, into living forest. The brand aches. It will ache for days.
+
+But you're alive. Scarred, drained, marked — but alive.`,
+    effects: { hp: -25, corruption: 3, setFlag: { hollow_branded: true } },
+    choices: [
+      { text: 'Stagger toward the village. Enough.', next: 'chapter_end_east_wounded' },
+    ]
   },
 
   hollow_boss_fight: {
     location: "The Hollow's Domain",
     scene: 'hollow',
     moodLabel: 'BOSS: THE HOLLOW',
-    text: `[blood]The air dies. Sound stops. You and it and dead ground between.[/blood]
+    text: `The dead clearing. Black soil. Petrified trees. An absence at center that makes your eyes slide off it.
+
+The Hollow stands there. In its territory, it's *solid* — tall, terribly proportioned, that smooth face turned toward you with absolute calm.
+
+The remaining shadows form a ring. You're inside. With it.
+
+[void]It speaks your name. {PLAYER_NAME}. Not fragments — fluid, natural, stolen from your own throat.[/void]
+
+It opens its arms. An invitation.
+
+[blood]The air dies. Sound stops. You and it and dead ground between.[/blood]
 
 It walks toward you. Measured. Something that has already won, going through formalities.
 
@@ -1080,20 +1308,23 @@ The gate closes. It won't be enough. But it's a start.[/void]`,
 (function() {
   var origRender = EV.renderScene;
   EV.renderScene = function(sceneObj) {
-    // Find scene key from chapter data (state.currentScene not yet updated)
     var key = null;
     var chData = EV.CHAPTERS[EV.state.currentArc + '-' + EV.state.currentChapter];
     if (chData) {
       for (var k in chData) { if (chData[k] === sceneObj) { key = k; break; } }
     }
 
-    // Shadow battle auto-start
+    // ── Original shadow battle (non-south path) ──
     if (key === 'shadow_battle_1' && !EV.state.flags._shadow1_fought) {
       EV.state.flags._shadow1_fought = true;
       origRender.call(EV, sceneObj);
       setTimeout(function() {
         EV.startBattle({
-          enemy: { name: 'Hollow Shadows', hp: 30, atk: 6, atkVar: 4, defense: 1, intro: 'Two shapes of cold static lunge from the dark.' },
+          enemy: {
+            name: 'Hollow Shadows',
+            hp: 65, atk: 8, atkVar: 5, defense: 3,
+            intro: 'Two shapes of cold static lunge from the dark.',
+          },
           onWin: function() { EV.navigateTo('post_shadow_battle_1'); },
           onLose: function() { EV.state.stats.hp = 5; EV.showNotification('You barely survive...', 'warning'); EV.navigateTo('post_shadow_battle_1'); },
           canFlee: true,
@@ -1102,7 +1333,84 @@ The gate closes. It won't be enough. But it's a start.[/void]`,
       return;
     }
 
-    // Hollow boss auto-start
+    // ── South shadow battle 1: 2 shadows ──
+    if (key === 'south_shadow_battle_1' && !EV.state.flags._south_shadow1_fought) {
+      EV.state.flags._south_shadow1_fought = true;
+      origRender.call(EV, sceneObj);
+      setTimeout(function() {
+        EV.startBattle({
+          enemy: {
+            name: 'Hollow Shadows',
+            hp: 55, atk: 8, atkVar: 4, defense: 3,
+            intro: 'Two shadows converge. Cold static and wrong geometry.',
+            missChance: function(s) { return s.agility >= 16 ? 0.2 : 0.05; },
+          },
+          onWin: function() { EV.navigateTo('south_shadow_1_win'); },
+          onLose: function() { EV.navigateTo('south_shadow_1_lose'); },
+          canFlee: false,
+        });
+      }, 500);
+      return;
+    }
+
+    // ── South shadow battle 2: 3 shadows ──
+    if (key === 'south_shadow_battle_2' && !EV.state.flags._south_shadow2_fought) {
+      EV.state.flags._south_shadow2_fought = true;
+      origRender.call(EV, sceneObj);
+      setTimeout(function() {
+        EV.startBattle({
+          enemy: {
+            name: 'Hollow Shadow Guards',
+            hp: 80, atk: 10, atkVar: 5, defense: 4,
+            intro: 'Three shadows. Larger, denser. They learned from the last pair.',
+            missChance: function(s) { return s.agility >= 18 ? 0.2 : 0.05; },
+            abilityChance: 0.2,
+            ability: function() {
+              var msgs = [
+                { msg: 'A shadow wraps around your leg — freezing numbness climbs.', damage: 12 },
+                { msg: 'Two strike simultaneously — coordinated cold.', damage: 15 },
+              ];
+              return msgs[Math.floor(Math.random() * msgs.length)];
+            },
+          },
+          onWin: function() { EV.navigateTo('south_shadow_2_win'); },
+          onLose: function() { EV.navigateTo('south_shadow_2_lose'); },
+          canFlee: false,
+        });
+      }, 500);
+      return;
+    }
+
+    // ── South shadow battle 3: 4 shadows (inner guard) ──
+    if (key === 'south_shadow_battle_3' && !EV.state.flags._south_shadow3_fought) {
+      EV.state.flags._south_shadow3_fought = true;
+      origRender.call(EV, sceneObj);
+      setTimeout(function() {
+        EV.startBattle({
+          enemy: {
+            name: 'Hollow Inner Guard',
+            hp: 100, atk: 12, atkVar: 6, defense: 5,
+            intro: 'Four shadows. The inner guard. The largest is almost humanoid.',
+            missChance: function(s) { return s.agility >= 20 ? 0.25 : 0.05; },
+            abilityChance: 0.3,
+            ability: function() {
+              var msgs = [
+                { msg: 'The lead shadow speaks your name. Pain lances through your skull.', damage: 16 },
+                { msg: 'All four compress — a wall of cold slams into you.', damage: 18 },
+                { msg: 'One shadow reaches into your chest. Something vital freezes.', damage: 14 },
+              ];
+              return msgs[Math.floor(Math.random() * msgs.length)];
+            },
+          },
+          onWin: function() { EV.navigateTo('south_shadow_3_win'); },
+          onLose: function() { EV.navigateTo('south_shadow_3_lose'); },
+          canFlee: false,
+        });
+      }, 500);
+      return;
+    }
+
+    // ── Hollow boss ──
     if (key === 'hollow_boss_result' && !EV.state.flags._hollow_boss_fought) {
       EV.state.flags._hollow_boss_fought = true;
       origRender.call(EV, sceneObj);
@@ -1110,16 +1418,17 @@ The gate closes. It won't be enough. But it's a start.[/void]`,
         EV.startBattle({
           enemy: {
             name: 'The Hollow',
-            hp: 200, atk: 18, atkVar: 8, defense: 15,
+            hp: 350, atk: 18, atkVar: 8, defense: 15,
             resistsAll: true,
             weakTo: ['light'],
             intro: 'The air dies. Sound stops. It walks toward you.',
-            missChance: function(stats) { return stats.agility >= 20 ? 0.5 : 0.15; },
-            abilityChance: 0.3,
+            missChance: function(stats) { return stats.agility >= 20 ? 0.4 : 0.1; },
+            abilityChance: 0.35,
             ability: function(state) {
+              state.stats.corruption += 1;
               var msgs = [
                 { msg: 'The Hollow reaches — its touch unravels the air.', damage: 25 },
-                { msg: 'It whispers your name. Reality shudders.', damage: 20 },
+                { msg: 'It whispers your name. Reality shudders.', damage: 22 },
                 { msg: 'A wave of dissolution. Cells forget their purpose.', damage: 30 },
               ];
               return msgs[Math.floor(Math.random() * msgs.length)];

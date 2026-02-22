@@ -16,8 +16,8 @@ const PROGRESS = (() => {
       ]
     },
     2: {
-      title: 'Arc II — To Be Determined...',
-      theme: '"Coming Soon..."',
+      title: 'Arc II — The Shadow Circle',
+      theme: '"In the pits below Veridia, survival is the only currency."',
       comingSoon: true,
       chapters: [
         { num: 1,  title: 'To Be Announced...' },

@@ -628,7 +628,8 @@ const EV = (() => {
     if(type==='element_select'){showElementSelect();setBattleButtons(false);return;}
 
     if(type==='attack'){
-      const dmg=Math.max(1,s.strength*2+Math.floor(Math.random()*s.strength)-(e.defense||0));
+      const baseDmg=Math.floor(s.strength*0.8)+Math.floor(Math.random()*Math.ceil(s.strength*0.4));
+      const dmg=Math.max(1,baseDmg-(e.defense||0));
       e.hp-=dmg; logBattle(`You strike for ${dmg} damage.`,'log-hit');
       battleState.defending=false;
     } else if(type==='defend'){
@@ -656,10 +657,10 @@ const EV = (() => {
     s.mana-=manaCost;
 
     // Base damage from resolve
-    let dmg=Math.max(3,s.resolve*2+Math.floor(Math.random()*s.resolve*2));
+    let dmg=Math.max(2,Math.floor(s.resolve*1.0)+Math.floor(Math.random()*Math.ceil(s.resolve*0.6)));
 
-    // Check enemy weakness
-    if(e.weakTo&&e.weakTo.includes(elementKey)){dmg*=2;logBattle(`${meta.symbol} ${meta.label} is super effective!`,'log-crit');}
+    // Check enemy weakness (1.5x, not 2x)
+    if(e.weakTo&&e.weakTo.includes(elementKey)){dmg=Math.floor(dmg*1.5);logBattle(`${meta.symbol} ${meta.label} is super effective!`,'log-crit');}
     // Check enemy resistance
     if(e.resistsAll&&!e.weakTo?.includes(elementKey)){dmg=Math.max(1,Math.floor(dmg*0.3));logBattle(`${e.name} resists ${meta.label}...`,'log-miss');}
     if(e.resists&&e.resists.includes(elementKey)){dmg=Math.max(1,Math.floor(dmg*0.3));}
