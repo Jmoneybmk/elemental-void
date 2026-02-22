@@ -10,10 +10,10 @@ const CHARGEN = (() => {
   const SOUL1_MAP = { charge:'fire', calculate:'earth', organize:'wind', observe:'shadow' };
   const SOUL2_MAP = { mercy:'light', bargain:'water', execute:'fire', torture:'shadow' };
   const ORIGIN_STATS = {
-    soldier:  { strength:8, agility:4, resolve:3, corruption:5 },
-    scholar:  { strength:2, agility:2, resolve:8, corruption:0 },
-    criminal: { strength:4, agility:8, resolve:2, corruption:8 },
-    survivor: { strength:3, agility:6, resolve:6, corruption:3 },
+    soldier:  { strength:8, agility:4, resolve:3, magic:2, corruption:5 },
+    scholar:  { strength:2, agility:2, resolve:6, magic:8, corruption:0 },
+    criminal: { strength:4, agility:8, resolve:2, magic:3, corruption:8 },
+    survivor: { strength:3, agility:6, resolve:6, magic:4, corruption:3 },
   };
   const INSTINCT_MAP = { aggressive:'aggressive', defensive:'defensive', tactical:'tactical', adaptive:'adaptive' };
 

@@ -885,16 +885,59 @@ Hands blue-white and numb. Path clear.`,
     location: 'Whispering Woods — Northern Rise',
     scene: 'mountain',
     moodLabel: 'Ascent',
-    text: `North. Uphill. Lungs burn, ribs protest.
+    text: `North. Uphill. Lungs burn, ribs protest. The terrain fights you — loose stone, gnarled roots, slopes that turn ankles.
 
-One shadow intercepts on the slope — smaller, weaker this far from center.
+The Hollow's reach weakens with every meter of elevation. Its shadows thin. But it sends one last guard — a shape coalescing on the ridgeline above, blocking the path.
 
-You sidestep easily. It dissolves against rock, unable to maintain coherence in thin, element-rich air.
+[blood]Bigger than the others you've seen. Denser. The altitude hasn't weakened this one — it was stationed here. A sentry.[/blood]
 
-[element]Elevation helps. Elemental density weakens the Hollow's projections.[/element]
+Between you and the ridge. Between you and escape.`,
+    choices: [ { text: '[ Fight: Mountain Shadow ]', next: 'north_shadow_battle' } ],
+  },
 
-Forest becomes scrubland. Ridge of exposed granite. A view.`,
-    choices: [ { text: 'Take in the view.', next: 'chapter_end_north' } ],
+  north_shadow_battle: {
+    location: 'Whispering Woods — Northern Ridge',
+    scene: 'battle',
+    moodLabel: 'COMBAT',
+    text: `The mountain shadow descends. Cold and solid.`,
+    effects: { setFlag: { north_shadow_battle_started: true } },
+    choices: [],
+  },
+
+  north_shadow_win: {
+    location: 'Whispering Woods — Northern Ridge',
+    scene: 'mountain',
+    moodLabel: 'Victory',
+    text: `The shadow fragments against the granite. Its remains scatter like frost on wind.
+
+You stand on the ridge, breathing hard, hands shaking. But alive.
+
+[element]Then you see it. Where the shadow dissolved — embedded in the rock, exposed by the creature's death — a crystal. Thumbnail-sized, translucent blue, pulsing with a slow inner light. It hums against your fingers when you pry it free.[/element]
+
+[void]Mana Crystal. Raw elemental energy, crystallized over centuries. Valuable. Useful. The kind of thing that changes what's possible.[/void]
+
+A view opens below — forest to every horizon, rivers catching dawn light, mountains north, and southeast: smoke. A village. Thirty buildings, wood and stone.
+
+Elmridge.`,
+    effects: { resolve: 1, strength: 1, item: { name: 'Mana Crystal', icon: '💎' }, setFlag: { has_mana_crystal: true, north_shadow_defeated: true } },
+    choices: [ { text: 'Descend toward the village.', next: 'chapter_end_north' } ],
+  },
+
+  north_shadow_lose: {
+    location: 'Whispering Woods — Northern Ridge',
+    scene: 'dark',
+    moodLabel: 'Staggered',
+    text: `The shadow hits hard. Mountain air doesn't weaken it as much as you hoped. You go down, cold burning through your chest.
+
+[blood]But the altitude does its work on the follow-up. The shadow destabilizes — flickering, losing coherence in the thin air. It can't finish you. It retreats downhill, back toward the Hollow's core.[/blood]
+
+You drag yourself over the ridge. Bleeding, frozen, but through.
+
+On the other side: a view. Forest, rivers, mountains. And a village. Smoke from chimneys.
+
+Elmridge.`,
+    effects: { hp: -15 },
+    choices: [ { text: 'Stagger toward the village.', next: 'chapter_end_north' } ],
   },
 
   path_south_hollow: {
@@ -1312,6 +1355,26 @@ The gate closes. It won't be enough. But it's a start.[/void]`,
     var chData = EV.CHAPTERS[EV.state.currentArc + '-' + EV.state.currentChapter];
     if (chData) {
       for (var k in chData) { if (chData[k] === sceneObj) { key = k; break; } }
+    }
+
+    // ── North mountain shadow battle ──
+    if (key === 'north_shadow_battle' && !EV.state.flags._north_shadow_fought) {
+      EV.state.flags._north_shadow_fought = true;
+      origRender.call(EV, sceneObj);
+      setTimeout(function() {
+        EV.startBattle({
+          enemy: {
+            name: 'Mountain Shadow',
+            hp: 70, atk: 10, atkVar: 5, defense: 4,
+            intro: 'A dense shadow, entrenched on the ridge. It charges downhill.',
+            missChance: function(s) { return s.agility >= 16 ? 0.25 : 0.1; },
+          },
+          onWin: function() { EV.navigateTo('north_shadow_win'); },
+          onLose: function() { EV.navigateTo('north_shadow_lose'); },
+          canFlee: true,
+        });
+      }, 500);
+      return;
     }
 
     // ── Original shadow battle (non-south path) ──

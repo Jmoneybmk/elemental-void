@@ -39,6 +39,33 @@ Not a question.`,
       { text: 'Say nothing. Let her talk first.', next: 'mara_reads_you' },
       { text: '"How do you know what I am?"', next: 'mara_how_know' },
       { text: '"I need to know where I am. Everything."', next: 'mara_explain_world' },
+      { text: '"I fought something in the forest. A creature called the Hollow."', condition: { flag: 'hollow_branded' }, next: 'mara_hollow_branded' },
+    ]
+  },
+
+  mara_hollow_branded: {
+    location: 'Elmridge — Elder Mara\'s Cottage',
+    scene: 'village',
+    moodLabel: 'Concern',
+    text: `Mara's hands stop moving. The cup she was reaching for stays on the table.
+
+*"Show me."*
+
+You turn. Her fingers trace the cold burn on your spine — the mark the Hollow left when you retreated. She inhales sharply.
+
+*"You went into its territory. Fought through its shadows. And then—"* she reads the mark like a text *"—you turned back. It branded you for the insult."*
+
+Her voice is different now. Not the calm elder dispensing tea. Something harder. Worried.
+
+*"This mark won't fade on its own. The Hollow has claimed you as... unfinished business. It will be harder to ignore you now."*
+
+[blood]She applies a poultice to the brand. The cold recedes slightly. Not healed — managed.[/blood]
+
+*"You're either very brave or very foolish. I've met both kinds of Outsider. The brave ones live longer."*`,
+    effects: { hp: 15, setFlag: { mara_saw_brand: true } },
+    choices: [
+      { text: '"Tell me about the other Outsiders."', next: 'mara_others' },
+      { text: '"Can you remove the mark?"', next: 'mara_hollow_warning' },
     ]
   },
 
@@ -58,8 +85,12 @@ A woman enters. Silver-haired, sixty or older. Hard-boned face, kind eyes that m
 
 [void]The Hollow. It almost succeeded.[/void]
 
-*"I'm Mara. Elder of Elmridge. And you are an Outsider, which means we have a great deal to discuss."*`,
-    effects: { hp: 30 },
+*"I'm Mara. Elder of Elmridge. And you are an Outsider, which means we have a great deal to discuss."*
+
+[blood]She presses more poultice to your chest. Warmth floods through you. Mara's hands glow faintly — Light element, dim but steady. She's healing you with elemental energy, and it's costing her.[/blood]
+
+*"Don't try to move yet. Whatever you fought, it nearly killed you. You need time."*`,
+    effects: { hp: 40, mana: 20 },
     choices: [
       { text: '"How did you know?"', next: 'mara_how_know' },
       { text: '"The thing that did this — the Hollow — is it still out there?"', next: 'mara_hollow_warning' },
@@ -537,7 +568,8 @@ A farmer notices you studying the gate and approaches nervously.
     effects: { resolve: 1, setFlag: { found_bandit_mark: true } },
     choices: [
       { text: '"How many bandits? What do they use?"', next: 'farmer_bandit_info' },
-      { text: 'Thank him and go to Mara for training.', next: 'mara_first_lesson' },
+      { text: 'Head to Mara for training.', next: 'mara_first_lesson' },
+      { text: 'Visit Garrick at the smithy.', next: 'talk_garrick' },
     ]
   },
 
@@ -557,6 +589,7 @@ She spits.
     effects: { setFlag: { found_bandit_mark: true, knows_bandit_history: true } },
     choices: [
       { text: 'Head to Mara. Training is more urgent than ever.', next: 'mara_first_lesson' },
+      { text: 'Talk to Garrick first.', next: 'talk_garrick' },
     ]
   },
 
@@ -591,7 +624,10 @@ He grips your arm briefly.
 
 [void]He walks back toward his field. You're left at the south gate, looking at bandit marks and thinking about thirty armed raiders against one village with no walls.[/void]`,
     effects: { setFlag: { villagers_know_element: true } },
-    choices: [ { text: 'Go to Mara. Start training.', next: 'mara_first_lesson' } ],
+    choices: [
+      { text: 'Go to Mara. Start training.', next: 'mara_first_lesson' },
+      { text: 'Visit Garrick at the smithy first.', next: 'talk_garrick' },
+    ]
   },
 
   farmer_deflect: {
@@ -605,7 +641,10 @@ He nods slowly. Not convinced, but not pushing.
 *"Well. If you can swing an axe, that's something. Garrick might have spare tools."*
 
 [void]You leave it there. Information about your abilities is currency, and you don't know the exchange rate yet.[/void]`,
-    choices: [ { text: 'Go to Mara. Training time.', next: 'mara_first_lesson' } ],
+    choices: [
+      { text: 'Go to Mara. Training time.', next: 'mara_first_lesson' },
+      { text: 'Stop by Garrick\'s smithy.', next: 'talk_garrick' },
+    ]
   },
 
   talk_garrick: {
@@ -630,6 +669,7 @@ He pauses his work, looks at you directly.
       { text: '"I\'ll help however I can while I\'m here."', next: 'garrick_grateful' },
       { text: '"I can\'t stay long. But I\'ll do what I can."', next: 'garrick_understands' },
       { text: 'Ask about the bandit marks on the south gate.', condition: { flag: 'noticed_scratch_marks' }, next: 'garrick_bandits' },
+      { text: 'Show him the Mana Crystal you found.', condition: { item: 'Mana Crystal' }, next: 'garrick_crystal_blade' },
     ]
   },
 
@@ -682,6 +722,170 @@ He sets the hammer down.
 He looks at you with an expression you recognize. A man measuring what he has against what he needs and finding the gap enormous.`,
     effects: { setFlag: { garrick_bandits_warned: true } },
     choices: [ { text: 'Resolve to help. Head to Mara for training.', next: 'mara_first_lesson' } ],
+  },
+
+  garrick_crystal_blade: {
+    location: 'Elmridge — Garrick\'s Smithy',
+    scene: 'fire',
+    moodLabel: 'Fascination',
+    text: `You pull the Mana Crystal from your pack. The blue light catches Garrick mid-swing. His hammer freezes in the air.
+
+*"Where did you—"* He sets the hammer down, comes closer. His eyes reflect the crystal's pulse. *"That's a Mana Crystal. Haven't seen one since my apprenticeship in Veridia."*
+
+He takes it gently, holds it to the forge-light. The crystal refracts the firelight into blue-white sparks.
+
+*"These form at elemental convergence points. Old ones, deep ones. Worth a fortune at the Academy. But—"*
+
+He looks at his forge. At his tools. Back at the crystal.
+
+[element]*"I could set this into a blade. The crystal would channel ambient mana into the edge — makes the weapon resonate with elemental energy. Hits harder. And for someone like you, it would amplify your connection."*[/element]
+
+*"It would take a few hours. But I haven't had materials this good in twenty years. Say the word and I'll make you something worth carrying."*`,
+    effects: { setFlag: { garrick_saw_crystal: true } },
+    choices: [
+      { text: '"Do it. Make the blade."', next: 'garrick_forges_blade' },
+      { text: '"Keep the crystal safe. I might need it later."', next: 'garrick_keeps_crystal' },
+    ]
+  },
+
+  garrick_forges_blade: {
+    location: 'Elmridge — Garrick\'s Smithy',
+    scene: 'fire',
+    moodLabel: 'Crafting',
+    text: `Garrick works for three hours straight. You watch — and learn. The forge reaches temperatures that make the air shimmer. He folds the steel around the crystal, not encasing it but *integrating* it. The crystal's light pulses through the metal like veins.
+
+[element]The finished blade is beautiful. Short sword length — longer than the utility knife, lighter than a broadsword. The steel has a blue-silver sheen. The crystal sits at the crossguard, pulsing in rhythm with your heartbeat.
+
+When you grip the hilt, {ELEMENT} surges. Not your doing — the blade is drawing ambient mana and feeding it to you. Your connection to {ELEMENT} sharpens. Clearer. Stronger.[/element]
+
+*"Crystal Edge,"* Garrick says, admiring his own work. *"Been a long time since I made something I was proud of."*`,
+    effects: {
+      strength: 3, magic: 3, removeItem: 'Mana Crystal',
+      item: { name: 'Crystal Edge', icon: '🗡' },
+      setFlag: { has_crystal_blade: true }
+    },
+    choices: [ { text: 'Head to Mara for training.', next: 'mara_first_lesson' } ],
+  },
+
+  garrick_keeps_crystal: {
+    location: 'Elmridge — Garrick\'s Smithy',
+    scene: 'village',
+    moodLabel: 'Reserved',
+    text: `Garrick nods. Disappointed but respectful.
+
+*"Smart. Crystal like that has uses beyond weapons. Mara might know some."*
+
+He hands you the utility knife instead.
+
+*"For now, take this. And if you change your mind about the blade — I'll be here."*`,
+    effects: { item: { name: 'Garrick\'s Knife', icon: '🔪' } },
+    choices: [ { text: 'Head to Mara for training.', next: 'mara_first_lesson' } ],
+  },
+
+  // ── VILLAGE TASKS ──────────────────────────────────────────
+
+  village_tasks: {
+    location: 'Elmridge — Village Square',
+    scene: 'village',
+    moodLabel: 'Afternoon',
+    text: `After Mara's lesson, the afternoon stretches ahead. The village has noticed you — and a village that notices an elementalist puts them to work.
+
+Several tasks need doing. Each one useful. Each one earns trust and teaches something.`,
+    choices: [
+      { text: 'Help Garrick at the forge. Heavy work, hot metal.', next: 'task_forge' },
+      { text: 'Assist the healer. Mix tinctures and tend the sick.', next: 'task_healer' },
+      { text: 'Help repair the south wall. Lift, carry, build.', next: 'task_wall' },
+      { text: 'Scout the perimeter with the watchman. Eyes and speed.', next: 'task_scout' },
+    ]
+  },
+
+  task_forge: {
+    location: 'Elmridge — Garrick\'s Smithy',
+    scene: 'fire',
+    moodLabel: 'Iron Work',
+    text: `Three hours at the forge. Pumping bellows, holding stock while Garrick hammers, carrying finished spearheads to the quench bucket.
+
+The heat is brutal. Your arms ache. But there's a rhythm to smithing that quiets the mind — strike, turn, strike, quench. Repetition as meditation.
+
+[void]Garrick doesn't talk much while he works. But at the end, he nods.
+
+*"You've got a laborer's hands now. Stronger than they look."*[/void]
+
+He slips you a small jar — weapon oil, for the blade he gave you.`,
+    effects: { strength: 2, item: { name: 'Weapon Oil', icon: '🫙' }, setFlag: { task_forge_done: true } },
+    choices: [
+      { text: 'Good work. Return to the square.', next: 'village_tasks_done' },
+    ]
+  },
+
+  task_healer: {
+    location: 'Elmridge — Healer\'s Stall',
+    scene: 'village',
+    moodLabel: 'Medicine',
+    text: `The village healer is a quiet woman named Daya. She teaches you to grind herbs, mix tinctures, identify the plants that heal from the ones that harm.
+
+*"Clarity Root for focus. Ironbloom for strength recovery. And this—"* she holds up a dried flower, deep purple *"—Veilpetal. Reduces elemental burnout. Mara uses it after heavy channeling."*
+
+[element]You learn to prepare a basic Health Salve — herb paste mixed with rendered fat and a drop of elemental water. It glows faintly. It works.[/element]
+
+*"Keep that. You'll need it more than my other patients."*`,
+    effects: { magic: 2, item: { name: 'Health Salve', icon: '🩹' }, setFlag: { task_healer_done: true } },
+    choices: [
+      { text: 'Thank Daya. Return to the square.', next: 'village_tasks_done' },
+    ]
+  },
+
+  task_wall: {
+    location: 'Elmridge — South Wall',
+    scene: 'village',
+    moodLabel: 'Building',
+    text: `The south wall is more hope than defense — timber stakes with gaps wide enough to walk through. You spend three hours hauling stone from the river, filling gaps, reinforcing the base.
+
+Physical labor. Honest. Your back screams but the wall looks better when you're done.
+
+[void]The other workers — farmers, a carpenter, two teenagers — work alongside you. By the end, they're talking to you. Not about the Hollow or elements or being an Outsider. About the weather. About the harvest. Normal things.
+
+You've earned a place, however temporary.[/void]`,
+    effects: { strength: 2, resolve: 1, setFlag: { task_wall_done: true, wall_reinforced: true } },
+    choices: [
+      { text: 'Wipe the sweat. Head back.', next: 'village_tasks_done' },
+    ]
+  },
+
+  task_scout: {
+    location: 'Elmridge — Perimeter',
+    scene: 'road',
+    moodLabel: 'Patrol',
+    text: `The village watchman, a lean man named Haral, takes you on his perimeter route. Two hours of walking, watching, reading sign.
+
+*"Look for broken branches at head height — means riders. Footprints in pairs — organized patrol. Singles scattered — animals or lost travelers."*
+
+He teaches you how the land looks when it's been scouted, how to spot where someone stood watching the village from cover.
+
+[blood]*"Here. See?"* He points to a flattened patch of grass on a low ridge. *"Someone lay here recently. Watching the south gate. Hours, based on the compression."*
+
+The Broken Fang. Closer than anyone thought.[/blood]`,
+    effects: { agility: 2, setFlag: { task_scout_done: true, bandit_scouts_spotted: true } },
+    choices: [
+      { text: 'Report to Mara. This is urgent.', next: 'village_tasks_done' },
+    ]
+  },
+
+  village_tasks_done: {
+    location: 'Elmridge — Village Square',
+    scene: 'village',
+    moodLabel: 'Evening',
+    text: `The day's work is done. You're tired in a good way — muscles used, skills learned, trust earned.
+
+The village settles into evening routines. Cook fires. Conversation. Children being called inside.
+
+[void]For a moment, it feels like a place you could belong. Then you remember the bandit marks, Mara's warnings, and the fact that something from beyond reality is hunting you.[/void]
+
+Tomorrow brings more training. And whatever comes after.`,
+    effects: { hp: 20, mana: 15 },
+    choices: [
+      { text: '[ Continue to evening training ]', next: 'afternoon_training' },
+    ]
   },
 
   solo_practice: {
@@ -767,8 +971,10 @@ A pause.
 She begins walking you through exercises: shrink the manifestation, expand it, move it from hand to hand. Each one builds a different aspect of control.
 
 By the end of the hour, your mana is low but your understanding is sharper.`,
-    effects: { mana: -30, resolve: 2, setFlag: { lesson_control_path: true, first_lesson_complete: true } },
-    choices: [ { text: 'Continue training through the afternoon.', next: 'afternoon_training' } ],
+    effects: { mana: -30, resolve: 2, magic: 1, setFlag: { lesson_control_path: true, first_lesson_complete: true } },
+    choices: [
+      { text: 'Mara dismisses you for the afternoon. Help around the village.', next: 'village_tasks' },
+    ]
   },
 
   lesson_force: {
@@ -794,8 +1000,10 @@ She's not angry. Almost amused.
 She spends the next hour on control exercises. Smaller manifestations. Sustained output. Breathing with the element rather than against it.
 
 Humbling. But effective.`,
-    effects: { mana: -40, strength: 1, setFlag: { lesson_force_path: true, first_lesson_complete: true } },
-    choices: [ { text: 'Continue training through the afternoon.', next: 'afternoon_training' } ],
+    effects: { mana: -40, strength: 1, magic: 1, setFlag: { lesson_force_path: true, first_lesson_complete: true } },
+    choices: [
+      { text: 'Mara sends you away to recover. Help around the village.', next: 'village_tasks' },
+    ]
   },
 
   afternoon_training: {
@@ -1205,15 +1413,72 @@ Mara's voice, ragged: *"The flanks. Don't let them regroup."*`,
 
 Three more fall. Four. But they keep coming, and Mara's light is failing, and the gate is splinters now.
 
-[blood]Then Garrick goes down. Axe to the shoulder. He falls behind you and doesn't get up immediately.[/blood]
+[blood]The line is breaking. Mara staggers. Garrick bleeds from a cut on his arm but keeps swinging. Both of them need you. You can only be in one place.[/blood]
 
-Mara sees it happen. Something in her expression hardens past endurance into something else entirely.
+Mara's voice cracks: *"I can overcharge the resonators — but I need cover!"*
 
-She overcharges the resonators herself. A blinding pulse — weaker than yours would have been, but enough. The attackers stagger. The charge breaks.
+Garrick shouts from the gate: *"They're flanking right! If someone doesn't hold that gap—"*
 
-*"Push them!"* Mara collapses to one knee. Still conscious. Barely.`,
-    effects: { strength: 1, corruption: 2, setFlag: { garrick_wounded: true, mara_overcharged: true } },
-    choices: [ { text: 'Rally the defense. Drive them back.', next: 'bandit_rout' } ],
+[void]Choose. One needs magic cover, the other needs a body in the gap. You can't do both.[/void]`,
+    effects: { strength: 1 },
+    choices: [
+      { text: 'Backup Mara. Cover her while she overcharges.', next: 'backup_mara' },
+      { text: 'Backup Garrick. Hold the gap.', next: 'backup_garrick' },
+    ]
+  },
+
+  backup_mara: {
+    location: 'Elmridge — Village Center',
+    scene: 'fire',
+    moodLabel: 'The Cost',
+    text: `You sprint to Mara. Shield her with {ELEMENT} while she reaches for the resonators.
+
+[element]{ELEMENT_SYMBOL} You pour everything into a barrier — not perfect, not strong, but enough to buy her ten seconds.[/element]
+
+The cascade fires. Weaker than if you'd done it, but enough. Bandits scatter.
+
+Then you hear it.
+
+A sound that doesn't belong in a battle — a wet, final sound. Metal into flesh.
+
+[blood]Garrick. At the gate gap. Alone. A bandit's spear through his chest.
+
+He falls slowly. Not dramatically — just a man's legs giving out. He hits the ground on his side, reaches toward his hammer out of habit, and stops reaching.[/blood]
+
+Mara sees. The sound she makes isn't a scream. It's worse.
+
+[void]Garrick is dead. The gap you left him to hold was the gap that killed him. Nobody says it. Nobody has to. You chose Mara. The consequence was Garrick.[/void]
+
+The resonator pulse did its work. The bandits are scattered. But the victory has a price written on the ground in front of the gate.`,
+    effects: { corruption: 4, resolve: -1, setFlag: { garrick_dead: true, resonators_destroyed: true, mara_overcharged: true } },
+    choices: [ { text: '...', next: 'bandit_rout' } ],
+  },
+
+  backup_garrick: {
+    location: 'Elmridge — South Gate',
+    scene: 'battle',
+    moodLabel: 'The Gap',
+    text: `You fill the gap beside Garrick. Shoulder to shoulder. Two people in a hole meant for five.
+
+*"About time!"* Garrick roars, swinging his hammer into the nearest attacker.
+
+You fight. Hard. {ELEMENT} blazes and Garrick hammers and the gap holds.
+
+[blood]Behind you — Mara overcharges the resonators alone. One elderly woman, channeling everything she has into a cascade meant for two elementalists.
+
+The pulse fires. Bandits scatter. The gate holds.
+
+Mara does not.[/blood]
+
+She collapses. Not unconscious — worse. Her eyes are open but *empty*. The mana channels in her body have burned out. Overcharged beyond recovery.
+
+[void]*Mana Burnout.* You've heard the term — the serpent's knowledge included it. When an elementalist pushes past their limits, the channels that carry elemental energy scar shut. Permanently.
+
+Mara will never channel again. Her Light element is gone. Not depleted — destroyed.[/void]
+
+Garrick reaches her first. The sound he makes when he realizes what happened is something you'll carry forever.`,
+    effects: { corruption: 2, resolve: 1, setFlag: { mara_burnout: true, resonators_destroyed: true } },
+    choices: [ { text: 'The battle isn\'t over.', next: 'bandit_rout' } ],
   },
 
   mara_resonator_sacrifice: {
@@ -1264,19 +1529,64 @@ Alive.`,
     location: 'Elmridge — Village Square',
     scene: 'village',
     moodLabel: 'What Remains',
-    text: `Twelve bandits dead. Four villagers wounded, none fatally. Garrick's shoulder will heal. Mara is unconscious but stable — elemental exhaustion, not injury.
-
-The resonators are gone. Every one. The village's ambient defenses, built over decades, destroyed in a single pulse.
+    text: `The Broken Fang are gone. The morning air is thick with smoke and the copper smell of blood.
 
 Villagers move through the aftermath in silence. Tending wounds. Counting losses. Staring at the broken gate and the bodies beyond it.
 
 A girl, maybe ten, brings you water without being asked. Her hands shake but her eyes are steady.
 
-[void]You defended them. With one element and one day of training and the kind of desperate improvisation that keeps people alive when nothing else will.
+[void]You defended them. With one element and barely two days of training and the kind of desperate improvisation that keeps people alive when nothing else will.
 
 It wasn't enough. It was barely enough. But it was enough.[/void]`,
     effects: { hp: 10, mana: 10 },
-    choices: [ { text: 'Find Mara.', next: 'mara_aftermath' } ],
+    choices: [ { text: 'Find Mara.', condition: { noFlag: 'garrick_dead' }, next: 'mara_aftermath' },
+              { text: 'Find Mara.', condition: { flag: 'garrick_dead' }, next: 'mara_aftermath_garrick_dead' },
+    ]
+  },
+
+  mara_aftermath_garrick_dead: {
+    location: 'Elmridge — Elder Mara\'s Cottage',
+    scene: 'village',
+    moodLabel: 'Grief',
+    text: `Mara is at the cottage, sitting beside the table, hands flat on the wood. She doesn't look up when you enter.
+
+Garrick's hammer sits on the table. Someone brought it from the gate.
+
+*"He held the gap."* Her voice is flat. Empty. *"Alone. Because you were covering me."*
+
+[void]She doesn't blame you. That's somehow worse. She states a fact, the way you'd note a change in weather.[/void]
+
+*"The resonators are destroyed. Garrick is dead. Elmridge is defenseless."*
+
+She finally looks at you. Red-eyed but steady.
+
+*"You need to go to Master Orin. Not for training — for help. Elmridge cannot survive another month without elemental defenses, and I cannot rebuild them alone."*
+
+She presses a sealed letter into your hands.
+
+*"Find Orin. Tell him what happened. He'll know what to do."*`,
+    effects: { setFlag: { has_mara_letter: true, departure_reason_garrick: true } },
+    choices: [
+      { text: '"I\'m sorry about Garrick."', next: 'mara_grief_response' },
+      { text: '"I\'ll find Orin. I\'ll bring help."', next: 'departure_healing' },
+    ]
+  },
+
+  mara_grief_response: {
+    location: 'Elmridge — Elder Mara\'s Cottage',
+    scene: 'village',
+    moodLabel: 'Weight',
+    text: `*"Don't apologize. You chose to save me. Garrick chose to hold the gap. We all made choices."*
+
+A long silence.
+
+*"He was the best man in this village. Twenty years of holding things together with iron and stubbornness. And now—"*
+
+She stops. Breathes. Continues.
+
+*"Now I hold things together alone. Which means I need you to bring help. Quickly."*`,
+    effects: { resolve: 1 },
+    choices: [ { text: '"I\'ll go. Today."', next: 'departure_healing' } ],
   },
 
   mara_aftermath: {
@@ -1304,7 +1614,7 @@ She reaches under her pillow. Pulls out the sealed letter.
 *"And more importantly—"* She presses the letter into your hands. *"—he can send help back. If anyone can restore what we've lost, it's him."*`,
     effects: { setFlag: { has_mara_letter: true } },
     choices: [
-      { text: '"I\'ll go. And I\'ll bring help back."', next: 'chapter_2_end' },
+      { text: '"I\'ll go. And I\'ll bring help back."', next: 'departure_healing' },
       { text: '"I can\'t leave you undefended."', next: 'mara_insists' },
     ]
   },
@@ -1327,7 +1637,24 @@ Her hand squeezes yours. Briefly. Strong for a woman who emptied herself an hour
 
 *"This is not goodbye. This is 'go and return.' There's a difference."*`,
     effects: { resolve: 1 },
-    choices: [ { text: '"I\'ll come back. I promise."', next: 'chapter_2_end' } ],
+    choices: [ { text: '"I\'ll come back. I promise."', next: 'departure_healing' } ],
+  },
+
+  departure_healing: {
+    location: 'Elmridge — Healer\'s Stall',
+    scene: 'village',
+    moodLabel: 'Recovery',
+    text: `Before you leave, the village healer — Daya — insists on treating your wounds. An hour of bandaging, poultice, and a bitter draught that floods your body with warmth.
+
+[element]The tincture she uses is stronger than the ones she taught you to make. Professional grade. It accelerates healing — not magic, but close. Bruises fade to yellow. Cuts close. The deep ache in your muscles softens.[/element]
+
+*"You're not fully healed. But you're functional. The road south is hard — you'll need everything you have."*
+
+She presses a small jar into your hands. *"Health Salve. For when it gets bad. And it will get bad."*
+
+Mara watches from the cottage doorway. She nods. Ready.`,
+    effects: { hp: 999, mana: 999, item: { name: 'Health Salve', icon: '🩹' }, setFlag: { healed_before_departure: true } },
+    choices: [ { text: 'Say your goodbyes. Leave Elmridge.', next: 'chapter_2_end' } ],
   },
 
   chapter_2_end: {
@@ -1336,21 +1663,14 @@ Her hand squeezes yours. Briefly. Strong for a woman who emptied herself an hour
     moodLabel: 'The Road Opens',
     text: `Dawn of the second day. The broken gate stands open. South: the road to Veridia, through forest and field and whatever Eldara puts in your path.
 
-Garrick meets you at the gate. His shoulder is bandaged, arm in a sling. He grips your hand with his good one.
+Mara's letter in your pack. Healed, rested, armed with what this village could give you.
 
-*"Come back in one piece, Outsider."*
-
-He presses something into your hand — a small iron pendant, the blacksmith's mark. *"Show that to any smith on the road. Garrick of Elmridge made their tools. It'll buy you a meal, at least."*
-
-The village watches you go. Thirty families who fought beside you. Children who brought you water. A baker who shared bread with a stranger.
-
-[void]Mara's letter in your pack. Garrick's pendant at your throat. One element, barely mastered. A monster in the woods behind you. An army in the north that wants you dead. And a road south that leads to — maybe — answers.
+[void]The village watches you go. Thirty families who fought beside you. Children who brought you water. A baker who shared bread with a stranger.
 
 Elmridge shrinks behind you. The forest ahead is vast and indifferent.
 
 You walk.[/void]`,
     effects: {
-      item: { name: 'Blacksmith\'s Pendant', icon: '⚒' },
       setFlag: { left_elmridge: true, chapter_2_complete: true }
     },
     choices: [ { text: '[ Continue to Chapter 3 ]', next: 'arc1/chapter3/the_road_south' } ],
@@ -1368,17 +1688,25 @@ You walk.[/void]`,
       for (var k in chData) { if (chData[k] === sceneObj) { key = k; break; } }
     }
 
-    // Bandit breach battle
+    // Bandit breach battle — easier if traps were set
     if (key === 'bandit_battle_start' && !EV.state.flags._bandit_battle_fought) {
       EV.state.flags._bandit_battle_fought = true;
+      var trapped = EV.state.flags.set_traps;
+      var fortified = EV.state.flags.fortified_gate;
+      var hp = trapped ? 40 : 60;
+      var atk = trapped ? 6 : 8;
+      var def = fortified ? 2 : 3;
+      var intro = trapped
+        ? 'The traps thin their charge — only two raiders make it through!'
+        : 'Three raiders crash through the breach, blades drawn.';
       origRender.call(EV, sceneObj);
       setTimeout(function() {
         EV.startBattle({
           enemy: {
             name: 'Broken Fang Raiders',
-            hp: 60, atk: 8, atkVar: 5, defense: 3,
-            intro: 'Three raiders crash through the breach, blades drawn.',
-            abilityChance: 0.2,
+            hp: hp, atk: atk, atkVar: 5, defense: def,
+            intro: intro,
+            abilityChance: trapped ? 0.1 : 0.2,
             ability: function(state) {
               var msgs = [
                 { msg: 'A raider flanks you — slash across the ribs!', damage: 12 },

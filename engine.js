@@ -32,6 +32,7 @@ const EV = (() => {
       strength: 10,
       agility: 10,
       resolve: 10,     // Willpower. Persuasion, mental resistance, mana efficiency, resist corruption gain
+      magic: 10,       // Magical power. Element attack damage, spell checks, elemental interactions
       corruption: 0,   // Darkness. Dark choices, shadow boost, light penalty, NPC reactions, story gates
     },
     flags: {},
@@ -124,6 +125,40 @@ const EV = (() => {
   function removeItem(name) { const i=state.inventory.findIndex(it=>it.name===name); if(i>-1)state.inventory.splice(i,1); renderInventory(); }
   function hasItem(name) { return state.inventory.some(it=>it.name===name); }
 
+  // ── CONSUMABLE ITEMS ────────────────────────────────────────
+  const CONSUMABLE_EFFECTS = {
+    'Mana Tincture':     { mana: 30, msg: 'Mana surges back. +30 mana.' },
+    'Salvaged Tincture': { mana: 20, msg: 'Crude but effective. +20 mana.' },
+    'Health Salve':      { hp: 30,   msg: 'Warmth spreads through wounds. +30 HP.' },
+    'Trail Rations':     { hp: 15, mana: 10, msg: 'You eat quickly. +15 HP, +10 mana.' },
+    'Fire Herb Pouch':   { mana: 25, msg: 'The herbs burn pleasantly. +25 mana.' },
+    'Clarity Fruit':     { mana: 20, hp: 10, msg: 'Sweet and sharp. +10 HP, +20 mana.' },
+  };
+
+  function useConsumable(name) {
+    const effects = CONSUMABLE_EFFECTS[name];
+    if (!effects) {
+      // Generic fallback for unknown consumables
+      modStat('hp', 20); modStat('mana', 15);
+      logBattle(`You use ${name}. +20 HP, +15 mana.`, 'log-hit');
+    } else {
+      if (effects.hp) modStat('hp', effects.hp);
+      if (effects.mana) modStat('mana', effects.mana);
+      logBattle(effects.msg, 'log-hit');
+    }
+    removeItem(name);
+    renderStats();
+    updateBattleDisplay();
+    // Enemy still gets a turn after item use
+    enemyTurn();
+  }
+
+  // ── MAGIC CHECK (for story choices gated by magic stat) ──
+  function magicCheck(threshold) {
+    const roll = state.stats.magic + Math.floor(Math.random() * 6);
+    return roll >= threshold;
+  }
+
   // ── ELEMENT HELPERS ────────────────────────────────────────
   function knowsElement(el) { return state.player.knownElements.includes(el); }
   function learnElement(el) {
@@ -161,10 +196,10 @@ const EV = (() => {
     const setText=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
     setPct('bar-hp',s.hp,s.maxHp); setPct('bar-mana',s.mana,s.maxMana);
     setPct('bar-str',s.strength,100); setPct('bar-agi',s.agility,100);
-    setPct('bar-res',s.resolve,100); setPct('bar-cor',s.corruption,100);
+    setPct('bar-res',s.resolve,100); setPct('bar-mag',s.magic,100); setPct('bar-cor',s.corruption,100);
     setText('val-hp',`${s.hp}/${s.maxHp}`); setText('val-mana',`${s.mana}/${s.maxMana}`);
     setText('val-str',s.strength); setText('val-agi',s.agility);
-    setText('val-res',s.resolve); setText('val-cor',s.corruption);
+    setText('val-res',s.resolve); setText('val-mag',s.magic); setText('val-cor',s.corruption);
     // Element display
     const elPanel=document.getElementById('element-display');
     if(elPanel){
@@ -308,6 +343,7 @@ const EV = (() => {
     if(effects.strength!==undefined) modStat('strength',effects.strength);
     if(effects.agility!==undefined)  modStat('agility',effects.agility);
     if(effects.resolve!==undefined)  modStat('resolve',effects.resolve);
+    if(effects.magic!==undefined)    modStat('magic',effects.magic);
     if(effects.corruption!==undefined){
       // Resolve reduces corruption gain: every 10 resolve = 1 less corruption gained
       let corDelta=effects.corruption;
@@ -335,6 +371,7 @@ const EV = (() => {
       if(cond.corruption) return state.stats.corruption>=cond.corruption;
       if(cond.corruptionBelow) return state.stats.corruption<cond.corruptionBelow;
       if(cond.resolve) return state.stats.resolve>=cond.resolve;
+      if(cond.magic) return state.stats.magic>=cond.magic;
       if(cond.visited){
         const vk=`${state.currentArc}-${state.currentChapter}-${cond.visited}`;
         return !!state.visitedScenes[vk];
@@ -635,8 +672,30 @@ const EV = (() => {
     } else if(type==='defend'){
       battleState.defending=true; logBattle('You brace yourself.','');
     } else if(type==='item'){
-      logBattle('You have nothing to use.','log-miss');
-      setBattleButtons(false);return;
+      // Show consumable items
+      const consumables = state.inventory.filter(it =>
+        it.name.match(/Tincture|Potion|Crystal|Herb|Salve|Ration/i)
+      );
+      if(consumables.length===0){
+        logBattle('No consumable items available.','log-miss');
+        setBattleButtons(false);return;
+      }
+      // Show item selection
+      const box=document.getElementById('battle-actions-box');if(!box){setBattleButtons(false);return;}
+      box.innerHTML='';
+      const back=document.createElement('button');back.className='battle-btn';back.textContent='← Back';
+      back.addEventListener('click',()=>showBattleActions());
+      box.appendChild(back);
+      consumables.forEach(item=>{
+        const btn=document.createElement('button');btn.className='battle-btn';
+        btn.textContent=`${item.icon} ${item.name}`;
+        btn.addEventListener('click',()=>{
+          useConsumable(item.name);
+          setBattleButtons(false);
+        });
+        box.appendChild(btn);
+      });
+      return;
     } else if(type==='flee'){
       if(!battleState.canFlee){logBattle('There is no escape.','log-miss');setBattleButtons(false);return;}
       const chance=0.35+s.agility*0.02;
@@ -656,8 +715,8 @@ const EV = (() => {
     const manaCost=15;
     s.mana-=manaCost;
 
-    // Base damage from resolve
-    let dmg=Math.max(2,Math.floor(s.resolve*1.0)+Math.floor(Math.random()*Math.ceil(s.resolve*0.6)));
+    // Base damage from magic stat
+    let dmg=Math.max(2,Math.floor(s.magic*1.0)+Math.floor(Math.random()*Math.ceil(s.magic*0.6)));
 
     // Check enemy weakness (1.5x, not 2x)
     if(e.weakTo&&e.weakTo.includes(elementKey)){dmg=Math.floor(dmg*1.5);logBattle(`${meta.symbol} ${meta.label} is super effective!`,'log-crit');}
@@ -728,7 +787,7 @@ const EV = (() => {
     registerChapter,
     save,load,deleteSave,hasSave,
     modStat,setFlag,getFlag,hasFlag,
-    addItem,removeItem,hasItem,
+    addItem,removeItem,hasItem,useConsumable,magicCheck,
     knowsElement,learnElement,getPlayerElementMeta,
     renderStats,renderInventory,renderScene,
     navigateTo,loadChapter,

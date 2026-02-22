@@ -555,6 +555,24 @@ The Blackwood waits south. You've burned daylight and mana, but the road is clea
       item: { name: 'Travel Cloak', icon: '🧥' },
       setFlag: { scar_defeated: true, broken_fang_destroyed: true }
     },
+    choices: [
+      { text: 'Rest among the camp ruins.', next: 'camp_rest' },
+      { text: 'Push on to the Blackwood.', next: 'blackwood_entrance' },
+    ]
+  },
+
+  camp_rest: {
+    location: 'Broken Fang Camp — Ruins',
+    scene: 'checkpoint',
+    moodLabel: 'Recovery',
+    text: `You sit among the ruins. Eat from the stolen supplies — dried meat, hard bread, a skin of water. Not good. But fuel.
+
+[void]Your body demands rest. Bruises darken. Cuts sting. Mana channels ache from overuse. You give yourself thirty minutes.[/void]
+
+The camp's cook fire still has embers. Warmth seeps into battered muscles. Your breathing slows. Element steadies.
+
+Not healed. But functional.`,
+    effects: { hp: 30, mana: 25 },
     choices: [ { text: 'Enter the Blackwood.', next: 'blackwood_entrance' } ],
   },
 
@@ -584,7 +602,10 @@ Toward whatever made that sound.`,
     effects: { hp: -20, item: { name: 'Travel Cloak', icon: '🧥' },
       setFlag: { scar_fled: true, heard_blackwood_howl: true }
     },
-    choices: [ { text: 'Enter the Blackwood.', next: 'blackwood_entrance' } ],
+    choices: [
+      { text: 'Rest first. Bandage wounds.', next: 'camp_rest' },
+      { text: 'Enter the Blackwood.', next: 'blackwood_entrance' },
+    ]
   },
 
   // ═══════════════════════════════════════════════════════════
@@ -1121,7 +1142,7 @@ A tree split down the middle, both halves still growing, the heartwood exposed a
     effects: { corruption: 1 },
     choices: [
       { text: 'Push through. The southern edge can\'t be far.', next: 'beast_encounter' },
-      { text: 'Look for shelter. Night is coming.', next: 'blackwood_camp' },
+      { text: 'Rest. You need to recover before going further.', next: 'blackwood_camp' },
     ]
   },
 
@@ -1633,19 +1654,67 @@ You stand at the forest's edge and breathe. Real breath. Air that doesn't taste 
 
 Mountains rise ahead. Snow-capped peaks, forests of proper green, streams catching light.
 
-[void]Somewhere in those mountains: Master Orin. Mara's letter. Answers, maybe. Training, certainly. A chance to become what this world needs you to be — or at least what you need yourself to be to survive it.[/void]
+[void]Behind you: the Blackwood. A darkness you walked through and came out the other side. Changed. Harder. Missing something Shiva took and carrying something Brennan gave.[/void]`,
+    effects: { hp: 20, mana: 20, resolve: 1, setFlag: { blackwood_survived: true } },
+    choices: [
+      { text: 'Make camp here. Recover before the climb.', next: 'foothills_camp' },
+      { text: 'Start climbing. You can rest later.', next: 'mountain_stream' },
+    ]
+  },
 
-Behind you: the Blackwood. A darkness you walked through and came out the other side. Changed. Harder. Missing something Shiva took and carrying something Brennan gave.
+  foothills_camp: {
+    location: 'Southern Foothills — Camp',
+    scene: 'mountain',
+    moodLabel: 'Rest',
+    text: `You make camp at the tree line. Real firewood — dry pine, not the Blackwood's tar-soaked timber. It burns clean and hot.
 
-The beast stands beside you. Bloody, tired, loyal without being asked.
+The beast curls beside the fire. Six legs tucked beneath, massive head on its paws, those four eyes watching you with quiet loyalty.
 
-The road south winds upward into the mountains. The sanctuary is close. You can feel it — an elemental density in the air, like standing near a power line. Something ahead is generating an enormous amount of energy.
+[void]You eat. Whatever's left in your pack, supplemented by a stream nearby. Cold water, clear as glass.
 
-You walk toward it. Upward. Into whatever comes next.`,
-    effects: {
-      hp: 20, mana: 20, resolve: 1,
-      setFlag: { blackwood_survived: true, chapter_3_complete: true }
-    },
+Sleep comes fast. No Hollow dreams. No Shiva whispers. Just darkness and rest.[/void]
+
+Morning. You're stiff but whole. Stronger than yesterday.`,
+    effects: { hp: 999, mana: 999 },
+    choices: [ { text: 'Begin the climb.', next: 'mountain_stream' } ],
+  },
+
+  mountain_stream: {
+    location: 'Mountain Trail — Stream Crossing',
+    scene: 'mountain',
+    moodLabel: 'Ascent',
+    text: `The trail climbs steadily. Following a stream that chatters over polished stone, cutting through switchbacks and pine groves. The air thins. Temperature drops.
+
+The beast navigates the terrain better than you — six legs on mountain rock is a considerable advantage.
+
+[element]You feel it before you see it — elemental density increasing with every hundred meters of elevation. The air hums. Your element responds, easier to reach, more responsive. Like standing near the resonators in Elmridge, but stronger.[/element]
+
+A convergence point. The kind of place where elemental energy pools naturally. No wonder Orin built his sanctuary here.
+
+Two hours of climbing. Your legs burn. Your lungs protest the thin air.
+
+Then: a plateau. A view.`,
+    choices: [ { text: 'Look.', next: 'sanctuary_view' } ],
+  },
+
+  sanctuary_view: {
+    location: 'Mountain Trail — Overlook',
+    scene: 'mountain',
+    moodLabel: 'The Destination',
+    text: `Below and ahead: a valley. Hidden between peaks, invisible from any approach except this trail.
+
+Green — impossibly green for this altitude. Trees with silver bark. A lake that reflects the sky like a mirror. Structures built into the mountainside, seamlessly integrated with the rock. Smoke from chimneys. Movement — people, training, living.
+
+[element]The elemental field is overwhelming. Every element you know — and several you don't — pulsing through the valley like a heartbeat. This isn't a village. It's a nexus. A place where the barriers between physical and elemental reality thin almost to nothing.[/element]
+
+Orin's sanctuary. The place Mara's letter is addressed to. The place where answers might live.
+
+[void]The beast beside you lifts its head. Makes a sound — not a bark or a howl, but a *note*. Musical. Resonant. Like it's singing to the valley.
+
+From somewhere below, something sings back.[/void]
+
+You descend toward the sanctuary. Whatever comes next — training, politics, truth, danger — it starts here.`,
+    effects: { setFlag: { chapter_3_complete: true, reached_sanctuary_approach: true } },
     choices: [ { text: '[ Continue to Chapter 4 ]', next: 'arc1/chapter4/mountain_approach' } ],
   },
 
