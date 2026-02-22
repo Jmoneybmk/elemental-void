@@ -283,7 +283,7 @@ The creature watches with a face that doesn't have eyes.
 Step forward. Step back. Another. Another.
 
 You turn and run. Lizard brain override: *not here, not now, not like this*.`,
-    effects: { item: { name: 'Gnarled Branch', icon: '\u{1FAB5}' } },
+    effects: { strength: 1, item: { name: 'Gnarled Branch', icon: '\u{1FAB5}' } },
     choices: [
       { text: 'West. Into the deeper forest. Away.', next: 'flee_west' },
     ]

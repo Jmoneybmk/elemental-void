@@ -33,6 +33,7 @@ const EV = (() => {
       agility: 10,
       resolve: 10,     // Willpower. Persuasion, mental resistance, mana efficiency, resist corruption gain
       magic: 10,       // Magical power. Element attack damage, spell checks, elemental interactions
+      defense: 5,      // Damage reduction. Armor, blocking, physical resistance
       corruption: 0,   // Darkness. Dark choices, shadow boost, light penalty, NPC reactions, story gates
     },
     flags: {},
@@ -121,7 +122,26 @@ const EV = (() => {
   function setFlag(key, val) { state.flags[key]=(val===undefined)?true:val; }
   function getFlag(key) { return state.flags[key]; }
   function hasFlag(key) { return !!state.flags[key]; }
-  function addItem(name,icon) { state.inventory.push({name,icon:icon||'◆'}); renderInventory(); showNotification(`Acquired: ${name}`,'info'); }
+  // ── EQUIPMENT DESCRIPTIONS ───────────────────────────────
+  const EQUIPMENT_INFO = {
+    'Crystal Edge':      '🗡 +3 Strength, +3 Magic — mana crystal-forged blade',
+    'Garrick\'s Knife':  '🔪 +2 Strength — blacksmith-quality utility blade',
+    'Bandit Short Sword':'⚔ +2 Strength — looted weapon',
+    'Leather Bracer':    '🛡 +3 Defense — off-hand guard',
+    'Stalker Fang':      '🦷 +2 Strength, +1 Magic — chitin blade from Blackwood apex predator',
+    'Travel Cloak':      '🧥 +2 Defense — fur-lined, warmth and protection',
+    'Blacksmith\'s Pendant':'⚒ Garrick\'s mark — show to smiths for aid',
+    'Weapon Oil':        '🫙 Blade maintenance',
+    'Gnarled Branch':    '🪵 +1 Strength — improvised weapon',
+    'Sharp Rock':        '🪨 +1 Strength — improvised weapon',
+    'Mana Crystal':      '💎 Raw elemental crystal — bring to a blacksmith',
+  };
+
+  function addItem(name,icon) {
+    state.inventory.push({name,icon:icon||'◆'});
+    renderInventory();
+    showNotification(`Acquired: ${name}`,'info');
+  }
   function removeItem(name) { const i=state.inventory.findIndex(it=>it.name===name); if(i>-1)state.inventory.splice(i,1); renderInventory(); }
   function hasItem(name) { return state.inventory.some(it=>it.name===name); }
 
@@ -196,10 +216,12 @@ const EV = (() => {
     const setText=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
     setPct('bar-hp',s.hp,s.maxHp); setPct('bar-mana',s.mana,s.maxMana);
     setPct('bar-str',s.strength,100); setPct('bar-agi',s.agility,100);
-    setPct('bar-res',s.resolve,100); setPct('bar-mag',s.magic,100); setPct('bar-cor',s.corruption,100);
+    setPct('bar-res',s.resolve,100); setPct('bar-mag',s.magic,100);
+    setPct('bar-def',s.defense,100); setPct('bar-cor',s.corruption,100);
     setText('val-hp',`${s.hp}/${s.maxHp}`); setText('val-mana',`${s.mana}/${s.maxMana}`);
     setText('val-str',s.strength); setText('val-agi',s.agility);
-    setText('val-res',s.resolve); setText('val-mag',s.magic); setText('val-cor',s.corruption);
+    setText('val-res',s.resolve); setText('val-mag',s.magic);
+    setText('val-def',s.defense); setText('val-cor',s.corruption);
     // Element display
     const elPanel=document.getElementById('element-display');
     if(elPanel){
@@ -232,7 +254,37 @@ const EV = (() => {
     if(state.inventory.length===0){bar.innerHTML='<span class="inv-empty">— empty —</span>';return;}
     state.inventory.forEach(item=>{
       const span=document.createElement('span'); span.className='inv-item';
+      const isConsumable = !!CONSUMABLE_EFFECTS[item.name];
       span.innerHTML=`<span class="inv-icon">${item.icon}</span> ${item.name}`;
+      if(isConsumable){
+        span.style.cursor='pointer';
+        span.style.borderBottom='1px dashed var(--gold)';
+        span.title='Click to use';
+        span.addEventListener('click',()=>{
+          // Don't use items during battle
+          const bui=document.getElementById('battle-ui');
+          if(bui&&bui.classList.contains('active')){
+            showNotification('Use items from the battle menu during combat.','warning');
+            return;
+          }
+          const effects=CONSUMABLE_EFFECTS[item.name];
+          if(effects){
+            if(effects.hp) modStat('hp',effects.hp);
+            if(effects.mana) modStat('mana',effects.mana);
+            showNotification(effects.msg,'success');
+          } else {
+            modStat('hp',20); modStat('mana',15);
+            showNotification(`Used ${item.name}. +20 HP, +15 mana.`,'success');
+          }
+          removeItem(item.name);
+          renderStats();
+        });
+      } else {
+        // Equipment — show stat info on hover
+        const info = EQUIPMENT_INFO[item.name];
+        if(info) span.title = info;
+        else span.title = 'Equipment';
+      }
       bar.appendChild(span);
     });
   }
@@ -344,6 +396,7 @@ const EV = (() => {
     if(effects.agility!==undefined)  modStat('agility',effects.agility);
     if(effects.resolve!==undefined)  modStat('resolve',effects.resolve);
     if(effects.magic!==undefined)    modStat('magic',effects.magic);
+    if(effects.defense!==undefined)  modStat('defense',effects.defense);
     if(effects.corruption!==undefined){
       // Resolve reduces corruption gain: every 10 resolve = 1 less corruption gained
       let corDelta=effects.corruption;
@@ -372,6 +425,7 @@ const EV = (() => {
       if(cond.corruptionBelow) return state.stats.corruption<cond.corruptionBelow;
       if(cond.resolve) return state.stats.resolve>=cond.resolve;
       if(cond.magic) return state.stats.magic>=cond.magic;
+      if(cond.defense) return state.stats.defense>=cond.defense;
       if(cond.visited){
         const vk=`${state.currentArc}-${state.currentChapter}-${cond.visited}`;
         return !!state.visitedScenes[vk];
@@ -672,10 +726,8 @@ const EV = (() => {
     } else if(type==='defend'){
       battleState.defending=true; logBattle('You brace yourself.','');
     } else if(type==='item'){
-      // Show consumable items
-      const consumables = state.inventory.filter(it =>
-        it.name.match(/Tincture|Potion|Crystal|Herb|Salve|Ration/i)
-      );
+      // Show only items that have defined consumable effects
+      const consumables = state.inventory.filter(it => !!CONSUMABLE_EFFECTS[it.name]);
       if(consumables.length===0){
         logBattle('No consumable items available.','log-miss');
         setBattleButtons(false);return;
@@ -755,6 +807,8 @@ const EV = (() => {
         eDmg=Math.max(1,e.atk+Math.floor(Math.random()*(e.atkVar||3)));
       }
       if(battleState.defending)eDmg=Math.floor(eDmg*0.4);
+      // Apply player defense stat
+      eDmg=Math.max(1,eDmg-Math.floor(s.defense*0.4));
       s.hp-=eDmg;
       if(!e.ability||Math.random()>=(e.abilityChance||0.25)){
         logBattle(`${e.name} strikes you for ${eDmg} damage.`,'log-enemy');

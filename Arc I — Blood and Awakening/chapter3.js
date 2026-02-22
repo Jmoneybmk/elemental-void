@@ -213,7 +213,7 @@ He stops talking. Stops everything.
 [void]You take what's useful — a waterskin, a short sword in decent condition, a pouch of dried meat. Pragmatism. Not looting. That's what you tell yourself.[/void]
 
 Ahead: the Blackwood treeline. And somewhere before it, twenty more just like these three.`,
-    effects: { kill: 3, corruption: 1, item: { name: 'Bandit Short Sword', icon: '⚔' }, setFlag: { scouts_dead: true } },
+    effects: { kill: 3, corruption: 1, strength: 2, item: { name: 'Bandit Short Sword', icon: '⚔' }, setFlag: { scouts_dead: true } },
     choices: [
       { text: 'Find their camp before they find you.', next: 'camp_scout' },
       { text: 'Avoid the camp. Push straight into the Blackwood.', next: 'skip_camp' },
@@ -551,7 +551,7 @@ Among the stolen goods: supplies meant for villages south of here. Dried food, m
 The Broken Fang is finished. Whatever stragglers fled into the scrubland won't reform. Not without their leader. Not after this.
 
 The Blackwood waits south. You've burned daylight and mana, but the road is clear.`,
-    effects: { kill: 1, resolve: 2, strength: 1, corruption: 1,
+    effects: { kill: 1, resolve: 2, strength: 1, defense: 2, corruption: 1,
       item: { name: 'Travel Cloak', icon: '🧥' },
       setFlag: { scar_defeated: true, broken_fang_destroyed: true }
     },
@@ -599,7 +599,7 @@ The camp scatters. Scar and his remaining fighters flee east, abandoning everyth
 You lie in the dirt until your vision clears. Then you stand, take what you need from the abandoned camp, and walk south.
 
 Toward whatever made that sound.`,
-    effects: { hp: -20, item: { name: 'Travel Cloak', icon: '🧥' },
+    effects: { hp: -20, defense: 2, item: { name: 'Travel Cloak', icon: '🧥' },
       setFlag: { scar_fled: true, heard_blackwood_howl: true }
     },
     choices: [
@@ -1511,16 +1511,16 @@ Brennan extinguishes his flames. Studies you with those ember-eyes.
 
 He sits. The combat intensity drops like a switch was flipped.
 
-*"I said I'd teach you Fire. Sit down. Close your eyes."*
+*"I said I'd teach you. Sit down. Close your eyes."*
 
 You sit. He places his hand on your chest — the warmth is extraordinary. Not burning. Awakening.
 
-[element]🔥 Fire ignites somewhere inside you. Not your primary — adjacent to it. A second resonance, fainter but real. Heat and transformation and the knowledge that things can change, must change, will change.
+[element]A second resonance ignites somewhere inside you — adjacent to your primary. Fainter but real. A new element, waiting to grow.
 
 *"Feel that? That's the seed. I can't grow it for you — only you can do that. But it's there now. You have two."*[/element]
 
-You open your eyes. Between your hands, alongside {ELEMENT}: a flicker of orange. Small. Uncertain. Yours.`,
-    effects: { resolve: 2, strength: 1, learnElement: 'fire', setFlag: { hermit_trial_passed: true, learned_fire_early: true } },
+You open your eyes. Between your hands, alongside {ELEMENT}: a new flicker. Small. Uncertain. Yours.`,
+    effects: { resolve: 2, strength: 1, magic: 2, setFlag: { hermit_trial_passed: true, learned_second_element: true } },
     choices: [ { text: 'Thank him. Continue south.', next: 'hermit_farewell' } ],
   },
 
@@ -1614,7 +1614,7 @@ Your beast-companion circles the corpse. Cautious, even now. Then it plants one 
 [void]It's claiming the territory. The beast you freed from a trap just killed the thing that set it. There's a poetry to that.[/void]
 
 From the Stalker's broken carapace: a shard of black chitin, hard as steel, sharp as glass. A natural blade.`,
-    effects: { kill: 1, resolve: 2, strength: 1,
+    effects: { kill: 1, resolve: 2, strength: 2, magic: 1,
       item: { name: 'Stalker Fang', icon: '🦷' },
       setFlag: { stalker_defeated: true }
     },
@@ -1919,28 +1919,44 @@ You descend toward the sanctuary. Whatever comes next — training, politics, tr
       return;
     }
 
-    // Battle 7: Hermit trial (survive = win at low HP)
+    // Hermit trial survive — learn a second element adaptively
+    if (key === 'hermit_trial_survive' && !EV.state.flags._hermit_element_learned) {
+      EV.state.flags._hermit_element_learned = true;
+      // Pick an element the player doesn't already know
+      var candidates = ['fire', 'water', 'earth', 'wind'];
+      var known = EV.state.player.knownElements;
+      var available = candidates.filter(function(e) { return known.indexOf(e) === -1; });
+      var chosen = available.length > 0 ? available[0] : null;
+      if (chosen) {
+        EV.learnElement(chosen);
+        EV.state.flags['learned_' + chosen + '_early'] = true;
+      }
+    }
+
+    // Battle 7: Hermit trial — survive 5 rounds to pass
     if (key === 'hermit_trial_start' && !EV.state.flags._ch3_hermit_fought) {
       EV.state.flags._ch3_hermit_fought = true;
       origRender.call(EV, sceneObj);
       setTimeout(function() {
+        var trialTurns = { count: 0 };
         EV.startBattle({
           enemy: {
             name: 'Brennan — The Hermit',
-            hp: 200, atk: 10, atkVar: 4, defense: 12,
-            intro: 'Fire erupts around his fists. He smiles.',
+            hp: 9999, atk: 10, atkVar: 4, defense: 12,
+            intro: 'Fire erupts around his fists. "Survive five rounds."',
             resists: ['fire'],
-            abilityChance: 0.4,
+            abilityChance: 1.0,
             ability: function(state, bs) {
-              bs.turn = (bs.turn || 0) + 1;
-              if (bs.turn >= 5) {
-                // After 5 rounds, hermit stops
-                return { msg: 'Brennan raises a hand. "Enough. You\'ve passed."', damage: 0 };
+              trialTurns.count++;
+              if (trialTurns.count >= 5) {
+                // Force end — set HP to 0 so battle resolves as "win"
+                bs.enemy.hp = 0;
+                return { msg: '🔥 Brennan stops. Lowers his fists. "Five rounds. You pass."', damage: 0 };
               }
               var msgs = [
-                { msg: '🔥 A whip of fire cracks across your guard!', damage: 12 },
-                { msg: '🔥 Brennan feints low, strikes high — heat sears your shoulder.', damage: 14 },
-                { msg: '🔥 The ground beneath you erupts in flame!', damage: 16 },
+                { msg: '🔥 A whip of fire cracks across your guard! (Round ' + trialTurns.count + '/5)', damage: 12 },
+                { msg: '🔥 Brennan feints low, strikes high! (Round ' + trialTurns.count + '/5)', damage: 14 },
+                { msg: '🔥 The ground erupts in flame! (Round ' + trialTurns.count + '/5)', damage: 16 },
               ];
               return msgs[Math.floor(Math.random() * msgs.length)];
             },

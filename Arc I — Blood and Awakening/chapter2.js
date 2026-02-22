@@ -1,5 +1,5 @@
 // ============================================================
-// ARC 1 · CHAPTER 2 — "The Shadow Circle"
+// ARC 1 · CHAPTER 2 — "The Whispering Woods"
 // Player arrives at Elmridge, meets Elder Mara, integrates.
 // Branches from Chapter 1:
 //   mara_meeting        — standard arrival (most paths)
@@ -684,7 +684,7 @@ He pauses his work, looks at you directly.
 He reaches under his workbench and produces a short blade — crude but sharp. Utility knife, not a weapon, but the weight of it feels better than empty hands.
 
 *"For the work. And whatever else comes."*`,
-    effects: { item: { name: 'Garrick\'s Knife', icon: '🔪' }, setFlag: { garrick_ally: true } },
+    effects: { strength: 2, item: { name: 'Garrick\'s Knife', icon: '🔪' }, setFlag: { garrick_ally: true } },
     choices: [ { text: 'Head to Mara for training.', next: 'mara_first_lesson' } ],
   },
 
@@ -701,7 +701,7 @@ Fair.
 He hands you a utility knife from the bench.
 
 *"For the work. Splitting wood's easier with a blade."*`,
-    effects: { item: { name: 'Garrick\'s Knife', icon: '🔪' } },
+    effects: { strength: 2, item: { name: 'Garrick\'s Knife', icon: '🔪' } },
     choices: [ { text: 'Head to Mara for training.', next: 'mara_first_lesson' } ],
   },
 
@@ -778,7 +778,7 @@ When you grip the hilt, {ELEMENT} surges. Not your doing — the blade is drawin
 He hands you the utility knife instead.
 
 *"For now, take this. And if you change your mind about the blade — I'll be here."*`,
-    effects: { item: { name: 'Garrick\'s Knife', icon: '🔪' } },
+    effects: { strength: 2, item: { name: 'Garrick\'s Knife', icon: '🔪' } },
     choices: [ { text: 'Head to Mara for training.', next: 'mara_first_lesson' } ],
   },
 
@@ -1252,7 +1252,7 @@ Two hours of drills. Footwork. Spacing. How to use a chokepoint. When to retreat
 [void]He's good. Not an elementalist, but a fighter who's survived real violence. His lessons are practical, brutal, and exactly what you need.[/void]
 
 *"One more thing."* He hands you a leather bracer. *"Wear this on your off-hand. Block with it. Your element goes through the dominant hand — always protect the other one."*`,
-    effects: { strength: 1, agility: 1, item: { name: 'Leather Bracer', icon: '🛡' }, setFlag: { combat_trained: true } },
+    effects: { defense: 3, item: { name: 'Leather Bracer', icon: '🛡' }, setFlag: { combat_trained: true } },
     choices: [ { text: 'Rest before dawn.', next: 'pre_battle_rest' } ],
   },
 
