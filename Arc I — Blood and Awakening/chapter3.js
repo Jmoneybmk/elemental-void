@@ -1513,14 +1513,16 @@ He sits. The combat intensity drops like a switch was flipped.
 
 *"I said I'd teach you. Sit down. Close your eyes."*
 
-You sit. He places his hand on your chest — the warmth is extraordinary. Not burning. Awakening.
+You sit. He places his hand on your chest — the warmth is extraordinary. Not burning. Awakening.`,
+    effects: { resolve: 2, strength: 1, setFlag: { hermit_trial_passed: true, learned_second_element: true } },
+    choices: [ { text: '...', next: 'brennan_element_reveal' } ],
+  },
 
-[element]A second resonance ignites somewhere inside you — adjacent to your primary. Fainter but real. A new element, waiting to grow.
-
-*"Feel that? That's the seed. I can't grow it for you — only you can do that. But it's there now. You have two."*[/element]
-
-You open your eyes. Between your hands, alongside {ELEMENT}: a new flicker. Small. Uncertain. Yours.`,
-    effects: { resolve: 2, strength: 1, magic: 2, setFlag: { hermit_trial_passed: true, learned_second_element: true } },
+  brennan_element_reveal: {
+    location: 'Blackwood Forest — Hermit\'s Hollow',
+    scene: 'fire',
+    moodLabel: 'Awakening',
+    text: '',
     choices: [ { text: 'Thank him. Continue south.', next: 'hermit_farewell' } ],
   },
 
@@ -1919,18 +1921,51 @@ You descend toward the sanctuary. Whatever comes next — training, politics, tr
       return;
     }
 
-    // Hermit trial survive — learn a second element adaptively
+    // Hermit trial survive — learn 2nd element from chargen scores
     if (key === 'hermit_trial_survive' && !EV.state.flags._hermit_element_learned) {
       EV.state.flags._hermit_element_learned = true;
-      // Pick an element the player doesn't already know
-      var candidates = ['fire', 'water', 'earth', 'wind'];
+      // Use the 2nd element from chargen scoring
+      var secondEl = EV.state.player._pendingSecondElement;
       var known = EV.state.player.knownElements;
-      var available = candidates.filter(function(e) { return known.indexOf(e) === -1; });
-      var chosen = available.length > 0 ? available[0] : null;
-      if (chosen) {
-        EV.learnElement(chosen);
-        EV.state.flags['learned_' + chosen + '_early'] = true;
+      // Fallback: if somehow same as primary or null, pick first unknown primary
+      if (!secondEl || known.indexOf(secondEl) !== -1) {
+        var candidates = ['fire','water','earth','wind','light','shadow'];
+        for (var ci = 0; ci < candidates.length; ci++) {
+          if (known.indexOf(candidates[ci]) === -1) { secondEl = candidates[ci]; break; }
+        }
       }
+      if (secondEl) {
+        EV.learnElement(secondEl);
+        EV.modProficiency(secondEl, 10);
+        EV.state.flags['learned_' + secondEl + '_from_brennan'] = true;
+      }
+    }
+
+    // Brennan element reveal — dynamic dialogue per element
+    if (key === 'brennan_element_reveal') {
+      var bEl = null;
+      var bKnown = EV.state.player.knownElements;
+      // Find which element Brennan just taught (the non-primary one)
+      for (var bi = 0; bi < bKnown.length; bi++) {
+        if (bKnown[bi] !== EV.state.player.primaryElement) { bEl = bKnown[bi]; break; }
+      }
+      var bMeta = bEl ? EV.ELEMENTS[bEl] : null;
+      var bName = bMeta ? bMeta.label : 'a new element';
+      var bSym = bMeta ? bMeta.symbol : '◆';
+
+      var dialogues = {
+        fire: '[element]' + bSym + ' Fire ignites somewhere inside you. Not your primary — adjacent to it. Heat and transformation and the knowledge that things can change, must change, will change.\n\n*"Fire is hunger. It wants. It consumes. That\\'s not weakness — that\\'s drive. Channel it and you\\'ll never lack for motivation. Let it channel you and you\\'ll burn everything you care about."*[/element]',
+        water: '[element]' + bSym + ' Water pools deep in your chest. Cool, patient, relentless. Not your primary element — something alongside it. Complementary.\n\n*"Water remembers everything. Every shore it\\'s touched, every stone it\\'s worn smooth. It\\'s the element of empathy — understanding what shapes things. Also the element of erosion. Patient destruction."*[/element]',
+        earth: '[element]' + bSym + ' Earth settles into your bones. Heavy, warm, immovable. A second resonance, solid where your first is fluid.\n\n*"Earth doesn\\'t move. That\\'s its power and its prison. Nothing breaks it — nothing shifts it — but nothing grows in stone alone. You\\'ll need to learn when to be the mountain and when to be the soil."*[/element]',
+        wind: '[element]' + bSym + ' Wind spirals through you. Thin, fast, impossible to hold. A second channel opens alongside your first — lighter, sharper.\n\n*"Wind is freedom. It goes where it wants, touches everything, stays nowhere. Best scouts, best messengers, worst prisoners. If they ever cage you — and they will try — wind is how you leave."*[/element]',
+        light: '[element]' + bSym + ' Light blooms behind your sternum. Warm, steady, clarifying. Everything in you feels exposed — not vulnerable, illuminated.\n\n*"Light doesn\\'t lie. Can\\'t lie. It shows everything exactly as it is, which makes it the most dangerous element in the wrong hands. Or the most healing in the right ones. It\\'s on you."*[/element]',
+        shadow: '[element]' + bSym + ' Shadow pools in the spaces between your thoughts. Not darkness — absence. A second element, quieter than your first, deeper.\n\n*"Shadow is what you know but don\\'t say. What you see but others miss. Every light casts one, and the bigger the light, the deeper the shadow. Don\\'t be afraid of it. Be afraid of people who pretend they don\\'t have one."*[/element]',
+      };
+
+      var dialog = dialogues[bEl] || dialogues['fire'];
+      var fullText = dialog + '\n\nYou open your eyes. Between your hands, alongside {ELEMENT}: ' + bSym + ' ' + bName + '. Small. Uncertain. Yours.\n\n*"Feel that? That\\'s the seed. I can\\'t grow it for you — only you can do that. But it\\'s there now. You have two."*\n\nHe studies you. Something shifts in his expression — not surprise. Recognition.\n\n*"You\\'re unbound. I wondered."*\n\nHe pokes the fire with a stick.\n\n[void]*"Met one Outsider before you. Fifty years back. She could hold three elements by the time the Guard found her. Three. Know what happened?"*\n\nHe doesn\\'t wait for your answer.\n\n*"She tried to fight four Crimson Guard captains. Each one a single-element master with decades of training. She had breadth. They had depth. She lasted nine seconds."*[/void]\n\nHe lets the silence hold. Then:\n\n*"Your gift isn\\'t power. It\\'s potential. There\\'s a difference, and the difference will kill you if you forget it. A master who\\'s spent thirty years refining one element will always hit harder than someone spreading thin across five. Build deep roots before you grow wide branches."*\n\n*"One at a time. That\\'s how you survive long enough for the potential to matter."*';
+
+      sceneObj.text = fullText;
     }
 
     // Battle 7: Hermit trial — survive 5 rounds to pass

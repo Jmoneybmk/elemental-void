@@ -25,6 +25,10 @@ const EV = (() => {
       tertiaryElement: null,
       knownElements: [],    // All elements the player has learned
       _pendingElement: null, // Set by chargen, revealed by serpent
+      _pendingSecondElement: null, // 2nd highest from chargen, taught by Brennan
+      elementProficiency: {  // Individual proficiency per primary element (0-100)
+        fire: 0, water: 0, earth: 0, wind: 0, light: 0, shadow: 0,
+      },
     },
     stats: {
       hp: 100, maxHp: 100,
@@ -184,10 +188,31 @@ const EV = (() => {
   function learnElement(el) {
     if(!knowsElement(el)) {
       state.player.knownElements.push(el);
+      // Set initial proficiency for primary elements
+      if(state.player.elementProficiency.hasOwnProperty(el)) {
+        state.player.elementProficiency[el] = Math.max(state.player.elementProficiency[el], 10);
+      }
       const meta=ELEMENTS[el];
       if(meta) showNotification(`Element awakened: ${meta.symbol} ${meta.label}`,'success');
       renderStats();
     }
+  }
+  function modProficiency(el, amount) {
+    if(state.player.elementProficiency.hasOwnProperty(el)) {
+      state.player.elementProficiency[el] = Math.min(100, Math.max(0, state.player.elementProficiency[el] + amount));
+      updateMagicStat();
+      renderStats();
+    }
+  }
+  function getProficiency(el) {
+    return state.player.elementProficiency[el] || 0;
+  }
+  function updateMagicStat() {
+    // Magic stat = average proficiency of known primary elements
+    const known = state.player.knownElements.filter(el => state.player.elementProficiency.hasOwnProperty(el));
+    if(known.length === 0) return;
+    const total = known.reduce((sum, el) => sum + (state.player.elementProficiency[el] || 0), 0);
+    state.stats.magic = Math.floor(total / known.length);
   }
   function getPlayerElementMeta() {
     const el=state.player.primaryElement;
@@ -407,6 +432,9 @@ const EV = (() => {
     if(effects.removeItem)removeItem(effects.removeItem);
     if(effects.setFlag)Object.entries(effects.setFlag).forEach(([k,v])=>setFlag(k,v));
     if(effects.learnElement)learnElement(effects.learnElement);
+    if(effects.proficiency){
+      Object.entries(effects.proficiency).forEach(([el,val])=>modProficiency(el,val));
+    }
     if(effects.kill)state.killCount+=effects.kill;
     renderStats();
   }
@@ -767,8 +795,15 @@ const EV = (() => {
     const manaCost=15;
     s.mana-=manaCost;
 
-    // Base damage from magic stat
-    let dmg=Math.max(2,Math.floor(s.magic*1.0)+Math.floor(Math.random()*Math.ceil(s.magic*0.6)));
+    // Base damage from element proficiency (not flat magic)
+    const prof = state.player.elementProficiency[elementKey] || state.stats.magic;
+    let dmg=Math.max(2,Math.floor(prof*1.0)+Math.floor(Math.random()*Math.ceil(prof*0.6)));
+
+    // Using element in combat grows its proficiency slightly
+    if(state.player.elementProficiency.hasOwnProperty(elementKey)) {
+      state.player.elementProficiency[elementKey] = Math.min(100, state.player.elementProficiency[elementKey] + 0.5);
+      updateMagicStat();
+    }
 
     // Check enemy weakness (1.5x, not 2x)
     if(e.weakTo&&e.weakTo.includes(elementKey)){dmg=Math.floor(dmg*1.5);logBattle(`${meta.symbol} ${meta.label} is super effective!`,'log-crit');}
@@ -842,7 +877,7 @@ const EV = (() => {
     save,load,deleteSave,hasSave,
     modStat,setFlag,getFlag,hasFlag,
     addItem,removeItem,hasItem,useConsumable,magicCheck,
-    knowsElement,learnElement,getPlayerElementMeta,
+    knowsElement,learnElement,getPlayerElementMeta,modProficiency,getProficiency,updateMagicStat,
     renderStats,renderInventory,renderScene,
     navigateTo,loadChapter,
     showTitleScreen,hideTitleScreen,

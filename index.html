@@ -113,7 +113,7 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
 
 #chargen-overlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(4,2,6,0.97);padding:20px}
 #chargen-overlay.active{display:flex}
-.chargen-box{width:100%;max-width:560px;background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:30px}
+.chargen-box{width:100%;max-width:560px;max-height:90vh;overflow-y:auto;background:var(--void-mid);border:1px solid var(--border);border-radius:var(--radius);padding:30px}
 .chargen-step{display:none}.chargen-step.active{display:block}
 .chargen-question{font-family:'IM Fell English',serif;font-size:17px;color:var(--text);margin-bottom:8px;line-height:1.6}
 .chargen-hint{font-size:13px;color:var(--text-faint);font-style:italic;margin-bottom:20px}
@@ -181,6 +181,8 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
 <!-- CHARGEN OVERLAY -->
 <div id="chargen-overlay">
   <div class="chargen-box">
+
+    <!-- STEP 1: NAME -->
     <div class="chargen-step active" id="step-1">
       <div class="chargen-question">The void asks a question before it lets you through. It doesn't use words. You understand anyway.</div>
       <div class="chargen-hint">What were you called?</div>
@@ -188,6 +190,7 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
       <button class="chargen-next-btn" id="name-next">Continue</button>
     </div>
 
+    <!-- STEP 2: ORIGIN -->
     <div class="chargen-step" id="step-2">
       <div class="chargen-question">Before the fall, before all of this — what were you?</div>
       <div class="chargen-hint">Your past shapes what survives.</div>
@@ -211,68 +214,248 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
       </div>
     </div>
 
+    <!-- STEP 3: CRISIS RESPONSE -->
     <div class="chargen-step" id="step-3">
       <div class="chargen-question">A building is on fire. There are people inside. You have seconds.</div>
       <div class="chargen-hint">Your soul answers before your mind does.</div>
-      <div class="chargen-options" id="soul1-options">
-        <button class="chargen-option" data-value="charge">
+      <div class="chargen-options" id="crisis-options">
+        <button class="chargen-option" data-value="rush_in">
           <span class="opt-label"><span class="opt-letter">A.</span> You go in. Right now. Thinking takes too long when people are burning.</span>
         </button>
-        <button class="chargen-option" data-value="calculate">
+        <button class="chargen-option" data-value="find_way">
           <span class="opt-label"><span class="opt-letter">B.</span> You assess the structure. Find the weakest entry. Three seconds of thought saves lives.</span>
         </button>
-        <button class="chargen-option" data-value="organize">
+        <button class="chargen-option" data-value="coordinate">
           <span class="opt-label"><span class="opt-letter">C.</span> You start shouting directions. Coordinate the people already here. Multiply the effort.</span>
         </button>
-        <button class="chargen-option" data-value="observe">
+        <button class="chargen-option" data-value="wait_moment">
           <span class="opt-label"><span class="opt-letter">D.</span> You watch. You note the exits. You wait for the moment where intervention actually changes the outcome.</span>
         </button>
       </div>
     </div>
 
+    <!-- STEP 4: MORAL DILEMMA -->
     <div class="chargen-step" id="step-4">
       <div class="chargen-question">You've captured someone who knows where three hostages are being held. They're not talking. The clock is running out.</div>
       <div class="chargen-hint">There is no clean answer. There never is.</div>
-      <div class="chargen-options" id="soul2-options">
-        <button class="chargen-option" data-value="mercy">
+      <div class="chargen-options" id="moral-options">
+        <button class="chargen-option" data-value="promise">
           <span class="opt-label"><span class="opt-letter">A.</span> You give them your word: cooperate, and they walk free. And you mean it.</span>
         </button>
-        <button class="chargen-option" data-value="bargain">
-          <span class="opt-label"><span class="opt-letter">B.</span> You get the information first. Then you decide. Trust is earned, not granted.</span>
+        <button class="chargen-option" data-value="negotiate">
+          <span class="opt-label"><span class="opt-letter">B.</span> You offer a trade. Something they want for something you need. Everyone walks away with something.</span>
         </button>
-        <button class="chargen-option" data-value="execute">
+        <button class="chargen-option" data-value="end_it">
           <span class="opt-label"><span class="opt-letter">C.</span> You end it. Some debts don't get negotiated. You'll find another way to save those people.</span>
         </button>
-        <button class="chargen-option" data-value="torture">
-          <span class="opt-label"><span class="opt-letter">D.</span> You take your time. The information can wait a few minutes.</span>
+        <button class="chargen-option" data-value="pressure">
+          <span class="opt-label"><span class="opt-letter">D.</span> You take your time. Everyone has a breaking point, and you're patient enough to find it.</span>
         </button>
       </div>
     </div>
 
+    <!-- STEP 5: COMBAT INSTINCT -->
     <div class="chargen-step" id="step-5">
       <div class="chargen-question">You're cornered. Three against one, and these people know what they're doing. Your first move is—</div>
       <div class="chargen-hint">Your body answers before your mind does.</div>
-      <div class="chargen-options" id="instinct-options">
+      <div class="chargen-options" id="combat-options">
         <button class="chargen-option" data-value="aggressive">
-          <span class="opt-label"><span class="opt-letter">A.</span> Close the distance fast. Hit before they're ready.</span>
-          <span class="opt-desc">Pain is temporary. Initiative is everything.</span>
+          <span class="opt-label"><span class="opt-letter">A.</span> Close the distance fast. Hit the strongest one before they're ready. Pain is temporary. Initiative is everything.</span>
         </button>
         <button class="chargen-option" data-value="defensive">
-          <span class="opt-label"><span class="opt-letter">B.</span> Ground yourself. Let them come. Read their movements.</span>
-          <span class="opt-desc">Patience kills faster than rage.</span>
+          <span class="opt-label"><span class="opt-letter">B.</span> Ground yourself. Let them come. Read their movements. Patience kills faster than rage.</span>
         </button>
         <button class="chargen-option" data-value="tactical">
-          <span class="opt-label"><span class="opt-letter">C.</span> Find the terrain advantage. Make the numbers irrelevant.</span>
-          <span class="opt-desc">Smarter, not harder.</span>
+          <span class="opt-label"><span class="opt-letter">C.</span> Find the terrain advantage. A doorway, a wall, anything that makes the numbers irrelevant. Smarter, not harder.</span>
         </button>
         <button class="chargen-option" data-value="adaptive">
-          <span class="opt-label"><span class="opt-letter">D.</span> Watch the first second. Everything you need to know is in how they move.</span>
-          <span class="opt-desc">Style is a luxury. Survival is the only rule.</span>
+          <span class="opt-label"><span class="opt-letter">D.</span> Watch the first second. Everything you need to know is in how they move. Then react.</span>
         </button>
       </div>
     </div>
 
+    <!-- STEP 6: CORE VALUE -->
     <div class="chargen-step" id="step-6">
+      <div class="chargen-question">You're given the power to protect one thing absolutely. Everything else becomes vulnerable. What do you shield?</div>
+      <div class="chargen-hint">What you protect reveals what you are.</div>
+      <div class="chargen-options" id="protect-options">
+        <button class="chargen-option" data-value="people">
+          <span class="opt-label"><span class="opt-letter">A.</span> The people you care about. Everything else can burn as long as they're safe.</span>
+        </button>
+        <button class="chargen-option" data-value="truth">
+          <span class="opt-label"><span class="opt-letter">B.</span> The truth. Lies are the foundation of every atrocity. Protect truth and everything else follows.</span>
+        </button>
+        <button class="chargen-option" data-value="yourself">
+          <span class="opt-label"><span class="opt-letter">C.</span> Yourself. You can't save anyone if you're dead. Self-preservation isn't selfishness — it's strategy.</span>
+        </button>
+        <button class="chargen-option" data-value="idea">
+          <span class="opt-label"><span class="opt-letter">D.</span> An idea. People die. Things break. But an idea, properly built, outlasts everything.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 7: FORMATIVE MEMORY -->
+    <div class="chargen-step" id="step-7">
+      <div class="chargen-question">Close your eyes. The first memory that surfaces — not the one you choose, the one that chooses you — what does it feel like?</div>
+      <div class="chargen-hint">The void reads what you don't say.</div>
+      <div class="chargen-options" id="memory-options">
+        <button class="chargen-option" data-value="warmth">
+          <span class="opt-label"><span class="opt-letter">A.</span> Heat. A campfire, a hand on your shoulder, someone's laugh. Warmth that meant safety.</span>
+        </button>
+        <button class="chargen-option" data-value="quiet">
+          <span class="opt-label"><span class="opt-letter">B.</span> Stillness. Rain on a window. A room where nothing was expected of you. Deep, still water.</span>
+        </button>
+        <button class="chargen-option" data-value="movement">
+          <span class="opt-label"><span class="opt-letter">C.</span> Motion. Running, climbing, the world blurring past. The feeling of nothing holding you down.</span>
+        </button>
+        <button class="chargen-option" data-value="watching">
+          <span class="opt-label"><span class="opt-letter">D.</span> Distance. Watching something from outside. Understanding it completely without being part of it.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 8: BETRAYAL -->
+    <div class="chargen-step" id="step-8">
+      <div class="chargen-question">Someone you trusted completely has betrayed you. Not a small thing — something that changed the shape of your life. What's your first real response?</div>
+      <div class="chargen-hint">Not what you'd tell people. What actually happens inside you.</div>
+      <div class="chargen-options" id="betrayal-options">
+        <button class="chargen-option" data-value="confront">
+          <span class="opt-label"><span class="opt-letter">A.</span> Rage. White-hot, immediate, righteous. You find them and make them explain. Or just make them hurt.</span>
+        </button>
+        <button class="chargen-option" data-value="understand">
+          <span class="opt-label"><span class="opt-letter">B.</span> You try to understand why. Not forgiveness — comprehension. What did they need badly enough to destroy this?</span>
+        </button>
+        <button class="chargen-option" data-value="plan">
+          <span class="opt-label"><span class="opt-letter">C.</span> Cold. Quiet. The anger goes somewhere deep and becomes something patient. You'll handle this, but on your timeline.</span>
+        </button>
+        <button class="chargen-option" data-value="leave">
+          <span class="opt-label"><span class="opt-letter">D.</span> Gone. You don't waste energy on people who've shown you who they are. The door closes and stays closed.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 9: OBSTACLE -->
+    <div class="chargen-step" id="step-9">
+      <div class="chargen-question">A locked door stands between you and something you need. Not want — need. There's no one to ask. No time to wait.</div>
+      <div class="chargen-hint">How you solve problems says more than how you fight.</div>
+      <div class="chargen-options" id="door-options">
+        <button class="chargen-option" data-value="break">
+          <span class="opt-label"><span class="opt-letter">A.</span> Hit it until it stops being a door. Elegance is overrated when urgency is real.</span>
+        </button>
+        <button class="chargen-option" data-value="pick">
+          <span class="opt-label"><span class="opt-letter">B.</span> Study the lock. Every mechanism has a weakness. You find it without leaving evidence you were here.</span>
+        </button>
+        <button class="chargen-option" data-value="find_key">
+          <span class="opt-label"><span class="opt-letter">C.</span> Backtrack. Find the key. The proper solution takes longer but doesn't break anything you might need later.</span>
+        </button>
+        <button class="chargen-option" data-value="go_around">
+          <span class="opt-label"><span class="opt-letter">D.</span> Why fight the door? Windows exist. Vents exist. The obvious path is rarely the only path.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 10: FEAR -->
+    <div class="chargen-step" id="step-10">
+      <div class="chargen-question">Three in the morning. Sleep won't come. The thought that surfaces — the one you usually push down — what is it?</div>
+      <div class="chargen-hint">What you fear reveals what you value.</div>
+      <div class="chargen-options" id="fear-options">
+        <button class="chargen-option" data-value="failure">
+          <span class="opt-label"><span class="opt-letter">A.</span> That none of it matters. That everything you build will collapse, and the effort was wasted.</span>
+        </button>
+        <button class="chargen-option" data-value="alone">
+          <span class="opt-label"><span class="opt-letter">B.</span> That you'll end up alone. Not physically — surrounded by people who don't actually know you.</span>
+        </button>
+        <button class="chargen-option" data-value="unseen">
+          <span class="opt-label"><span class="opt-letter">C.</span> That something is watching. Something you can't see, can't fight, can't understand. And it's patient.</span>
+        </button>
+        <button class="chargen-option" data-value="trapped">
+          <span class="opt-label"><span class="opt-letter">D.</span> That you're already trapped. That the walls you can't see are the ones you built yourself.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 11: LEADERSHIP -->
+    <div class="chargen-step" id="step-11">
+      <div class="chargen-question">A group of people are looking to you for a decision. Lives depend on it. You don't have enough information. What do you do?</div>
+      <div class="chargen-hint">Authority without certainty. This is where leaders are made or broken.</div>
+      <div class="chargen-options" id="leader-options">
+        <button class="chargen-option" data-value="front">
+          <span class="opt-label"><span class="opt-letter">A.</span> Decide. Now. A wrong decision made with conviction beats paralysis. You lead from the front and absorb the consequences.</span>
+        </button>
+        <button class="chargen-option" data-value="listen">
+          <span class="opt-label"><span class="opt-letter">B.</span> Ask. Quickly, specifically. Someone here knows something you don't. Find them, listen, then decide.</span>
+        </button>
+        <button class="chargen-option" data-value="delegate">
+          <span class="opt-label"><span class="opt-letter">C.</span> Split the problem. Send the right people to gather the right information. Trust your team. Decide when the pieces come back.</span>
+        </button>
+        <button class="chargen-option" data-value="solo">
+          <span class="opt-label"><span class="opt-letter">D.</span> Withdraw. Take thirty seconds alone. Silence the noise. The answer is already in your head — you just need the crowd to stop talking so you can hear it.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 12: PHILOSOPHY -->
+    <div class="chargen-step" id="step-12">
+      <div class="chargen-question">At the end of your life, you're given a single measure of whether it mattered. What do you choose?</div>
+      <div class="chargen-hint">This is the question underneath all the other questions.</div>
+      <div class="chargen-options" id="philosophy-options">
+        <button class="chargen-option" data-value="destination">
+          <span class="opt-label"><span class="opt-letter">A.</span> What you built. The things that will stand after you're gone. Foundations. Structures. Something permanent.</span>
+        </button>
+        <button class="chargen-option" data-value="journey">
+          <span class="opt-label"><span class="opt-letter">B.</span> What you experienced. The roads, the storms, the moments of perfect clarity. The journey was the point.</span>
+        </button>
+        <button class="chargen-option" data-value="people_met">
+          <span class="opt-label"><span class="opt-letter">C.</span> Who you loved. The connections. The people who were changed by knowing you, and who changed you in return.</span>
+        </button>
+        <button class="chargen-option" data-value="lessons">
+          <span class="opt-label"><span class="opt-letter">D.</span> What you understood. The patterns you saw that others missed. The knowledge that sits in the dark, waiting to be found.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 13: JUSTICE -->
+    <div class="chargen-step" id="step-13">
+      <div class="chargen-question">You witness a powerful person destroying someone weaker. Publicly. No one else is moving. The victim looks at you.</div>
+      <div class="chargen-hint">The space between seeing and acting is where character lives.</div>
+      <div class="chargen-options" id="justice-options">
+        <button class="chargen-option" data-value="intervene">
+          <span class="opt-label"><span class="opt-letter">A.</span> You step in. Physically, verbally, whatever it takes. Power unchecked is power that grows. Someone has to be first.</span>
+        </button>
+        <button class="chargen-option" data-value="document">
+          <span class="opt-label"><span class="opt-letter">B.</span> You witness. Record. Remember every detail. This person's cruelty becomes evidence, and evidence outlasts the moment.</span>
+        </button>
+        <button class="chargen-option" data-value="systemic">
+          <span class="opt-label"><span class="opt-letter">C.</span> You help the victim after. Quietly, practically. Then you start working on the system that allowed this to happen.</span>
+        </button>
+        <button class="chargen-option" data-value="survive">
+          <span class="opt-label"><span class="opt-letter">D.</span> You watch. Calculate. This isn't your fight, and martyrdom doesn't save anyone. You note who has power and file it away.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 14: POWER -->
+    <div class="chargen-step" id="step-14">
+      <div class="chargen-question">You've been given power. Real power — the kind that changes how people look at you when you walk into a room. What is it to you?</div>
+      <div class="chargen-hint">The last question. The void is listening very carefully.</div>
+      <div class="chargen-options" id="power-options">
+        <button class="chargen-option" data-value="tool">
+          <span class="opt-label"><span class="opt-letter">A.</span> A tool. Power serves purpose. You use it to build what needs building, break what needs breaking, and put it down when the job is done.</span>
+        </button>
+        <button class="chargen-option" data-value="burden">
+          <span class="opt-label"><span class="opt-letter">B.</span> A responsibility. Power is weight. Every decision you make with it affects someone who didn't ask for your involvement.</span>
+        </button>
+        <button class="chargen-option" data-value="freedom">
+          <span class="opt-label"><span class="opt-letter">C.</span> Freedom. Not over others — from constraint. Power means no one tells you what you can't do, can't be, can't reach.</span>
+        </button>
+        <button class="chargen-option" data-value="mirror">
+          <span class="opt-label"><span class="opt-letter">D.</span> A mirror. Power doesn't change you — it reveals you. You want to see what's underneath. Even if it's ugly.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 15: SUMMARY -->
+    <div class="chargen-step" id="step-15">
       <div class="chargen-question" style="text-align:center;margin-bottom:20px;">The void has heard you.</div>
       <div id="chargen-summary" style="background:var(--void);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;font-size:14px;line-height:1.8;color:var(--text-dim);"></div>
       <button class="chargen-next-btn" id="begin-btn">Enter Eldara</button>
@@ -280,11 +463,13 @@ em{color:var(--gold-light)}strong{color:var(--gold)}
 
     <div class="chargen-progress">
       <div class="chargen-dot active"></div>
-      <div class="chargen-dot"></div>
-      <div class="chargen-dot"></div>
-      <div class="chargen-dot"></div>
-      <div class="chargen-dot"></div>
-      <div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
+      <div class="chargen-dot"></div><div class="chargen-dot"></div>
     </div>
   </div>
 </div>

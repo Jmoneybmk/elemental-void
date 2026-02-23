@@ -973,7 +973,7 @@ She begins walking you through exercises: shrink the manifestation, expand it, m
 By the end of the hour, your mana is low but your understanding is sharper.`,
     effects: { mana: -30, resolve: 2, magic: 1, setFlag: { lesson_control_path: true, first_lesson_complete: true } },
     choices: [
-      { text: 'Mara dismisses you for the afternoon. Help around the village.', next: 'village_tasks' },
+      { text: 'Mara has something else to say.', next: 'mara_outsider_revelation' },
     ]
   },
 
@@ -1002,8 +1002,69 @@ She spends the next hour on control exercises. Smaller manifestations. Sustained
 Humbling. But effective.`,
     effects: { mana: -40, strength: 1, magic: 1, setFlag: { lesson_force_path: true, first_lesson_complete: true } },
     choices: [
-      { text: 'Mara sends you away to recover. Help around the village.', next: 'village_tasks' },
+      { text: 'Mara has something else to say.', next: 'mara_outsider_revelation' },
     ]
+  },
+
+  mara_outsider_revelation: {
+    location: 'Elmridge — Mara\'s Garden',
+    scene: 'village',
+    moodLabel: 'The Truth',
+    text: `Mara sits on the garden bench. The lesson is over, but she hasn't dismissed you. Something is working behind her eyes.
+
+*"There's something I need to tell you. Something about what you are."*
+
+She watches your hands — the ones that just channeled {ELEMENT}.
+
+*"I've seen three Outsiders in my lifetime. The first could channel Fire. Only Fire. The second had an affinity for Earth and nothing else. Both of them — one element, like any native Eldaran."*
+
+A pause.
+
+*"But there was a story. Old. About an Outsider from centuries ago who could channel more than one. The scholars in Veridia called it 'unbound affinity.' No elemental ceiling. No natural limit to how many elements a person could learn."*
+
+[void]She looks at you the way a doctor looks at a patient who doesn't know their diagnosis yet.[/void]
+
+*"When you channeled just now, I watched your mana pathways. They're not shaped like a native channeler's. They're... open. Unfinished. Like the architecture is there for more than one element, but only {ELEMENT} has filled it so far."*
+
+*"I think you're unbound, {PLAYER_NAME}."*
+
+She lets that sit. Then the warning.
+
+[blood]*"Listen carefully. In Eldara, most people spend their entire lives mastering a single element. A Fire master who's trained for thirty years will burn through your defenses like paper if all you have is shallow knowledge across three elements. Breadth without depth is a death sentence against real threats."*[/blood]
+
+*"And there's another problem. The Crimson Guard hunts multi-element wielders. It's rare among natives — and when it happens, Aldarion claims them. Voluntarily or otherwise. If they learn an Outsider can do it—"*
+
+She doesn't finish the sentence.
+
+*"Train deep before you train wide. Master what you have before you reach for more. And for the love of everything sacred, do not show multiple elements to anyone you don't trust with your life."*`,
+    effects: { setFlag: { mara_revealed_unbound: true, knows_unbound_affinity: true } },
+    choices: [
+      { text: '"How do I know who to trust?"', next: 'mara_trust_answer' },
+      { text: '"Understood. Depth first."', next: 'village_tasks' },
+    ]
+  },
+
+  mara_trust_answer: {
+    location: 'Elmridge — Mara\'s Garden',
+    scene: 'village',
+    moodLabel: 'Advice',
+    text: `Mara almost smiles.
+
+*"You don't. Not for a while. Trust is earned slowly and lost instantly in Eldara. Garrick — you can trust. Orin — if you reach him — you can trust. Beyond that?"*
+
+She shrugs.
+
+*"Watch how people treat those weaker than themselves. That tells you everything."*
+
+She stands. Brushes dirt from her knees.
+
+*"Go. Help around the village. We'll train more this evening. And {PLAYER_NAME}—"*
+
+She catches your arm.
+
+*"One element at a time. Promise me."*`,
+    effects: { resolve: 1 },
+    choices: [ { text: '"I promise."', next: 'village_tasks' } ],
   },
 
   afternoon_training: {
@@ -1408,10 +1469,31 @@ Mara's voice, ragged: *"The flanks. Don't let them regroup."*`,
   fight_without_resonators: {
     location: 'Elmridge — South Gate',
     scene: 'battle',
-    moodLabel: 'Blood Price',
+    moodLabel: 'Second Wave',
     text: `You keep fighting. Element and blade and desperate violence.
 
-Three more fall. Four. But they keep coming, and Mara's light is failing, and the gate is splinters now.
+The first wave is broken — but the second comes immediately. More organized, more brutal. Their lieutenant leads this one, a woman with a shield and a voice that carries.
+
+[blood]They hit the gate like a hammer. The timbers crack. Garrick roars and swings. Mara's light flares. And the breach widens.[/blood]`,
+    effects: { strength: 1, setFlag: { second_wave_started: true } },
+    choices: [ { text: '[ Fight: Second Wave ]', next: 'second_wave_battle' } ],
+  },
+
+  second_wave_battle: {
+    location: 'Elmridge — South Gate',
+    scene: 'battle',
+    moodLabel: 'COMBAT',
+    text: `The second wave crashes through.`,
+    choices: [],
+  },
+
+  second_wave_win: {
+    location: 'Elmridge — South Gate',
+    scene: 'battle',
+    moodLabel: 'Breaking',
+    text: `The lieutenant falls. Her shield-arm broken, dragged back by her own people. The second wave wavers.
+
+But there are more behind them. A third push forming at the road's edge.
 
 [blood]The line is breaking. Mara staggers. Garrick bleeds from a cut on his arm but keeps swinging. Both of them need you. You can only be in one place.[/blood]
 
@@ -1420,22 +1502,47 @@ Mara's voice cracks: *"I can overcharge the resonators — but I need cover!"*
 Garrick shouts from the gate: *"They're flanking right! If someone doesn't hold that gap—"*
 
 [void]Choose. One needs magic cover, the other needs a body in the gap. You can't do both.[/void]`,
-    effects: { strength: 1 },
+    effects: {},
     choices: [
-      { text: 'Backup Mara. Cover her while she overcharges.', next: 'backup_mara' },
-      { text: 'Backup Garrick. Hold the gap.', next: 'backup_garrick' },
+      { text: 'Backup Mara. Cover her while she overcharges.', next: 'backup_mara_battle' },
+      { text: 'Backup Garrick. Hold the gap.', next: 'backup_garrick_battle' },
     ]
   },
 
-  backup_mara: {
+  second_wave_lose: {
+    location: 'Elmridge — South Gate',
+    scene: 'battle',
+    moodLabel: 'Desperate',
+    text: `You go down. A shield bash catches your jaw, stars exploding. The lieutenant steps over you.
+
+[blood]Garrick hauls you back before the follow-up. Your mouth tastes like copper. The gate is almost gone.[/blood]
+
+Mara screams from behind the line: *"The resonators! NOW! It's our only chance!"*
+
+She doesn't wait for your answer. She's already reaching for the nearest crystal.`,
+    effects: { hp: -15 },
+    choices: [
+      { text: 'Cover Mara while she overcharges.', next: 'backup_mara_battle' },
+      { text: 'Hold the gap with Garrick instead.', next: 'backup_garrick_battle' },
+    ]
+  },
+
+  // ── DEFENSE BATTLES ──────────────────────────────────────
+  backup_mara_battle: {
+    location: 'Elmridge — Village Center',
+    scene: 'battle',
+    moodLabel: 'COMBAT — Covering Mara',
+    text: `You sprint to Mara. Bandits follow — three of them, trying to reach her before the cascade fires.
+
+Protect her. Buy her ten seconds.`,
+    choices: [],
+  },
+
+  backup_mara_battle_win: {
     location: 'Elmridge — Village Center',
     scene: 'fire',
     moodLabel: 'The Cost',
-    text: `You sprint to Mara. Shield her with {ELEMENT} while she reaches for the resonators.
-
-[element]{ELEMENT_SYMBOL} You pour everything into a barrier — not perfect, not strong, but enough to buy her ten seconds.[/element]
-
-The cascade fires. Weaker than if you'd done it, but enough. Bandits scatter.
+    text: `The bandits fall. Mara's hands glow white-hot. The cascade fires.
 
 Then you hear it.
 
@@ -1449,36 +1556,76 @@ Mara sees. The sound she makes isn't a scream. It's worse.
 
 [void]Garrick is dead. The gap you left him to hold was the gap that killed him. Nobody says it. Nobody has to. You chose Mara. The consequence was Garrick.[/void]
 
-The resonator pulse did its work. The bandits are scattered. But the victory has a price written on the ground in front of the gate.`,
+The resonator pulse scatters the bandits. But the victory has a price written on the ground.`,
     effects: { corruption: 4, resolve: -1, setFlag: { garrick_dead: true, resonators_destroyed: true, mara_overcharged: true } },
     choices: [ { text: '...', next: 'bandit_rout' } ],
   },
 
-  backup_garrick: {
+  backup_mara_battle_lose: {
+    location: 'Elmridge — Village Center',
+    scene: 'fire',
+    moodLabel: 'Overwhelmed',
+    text: `They're too many. You go down trying to shield Mara.
+
+[blood]But she saw it coming. The moment you fell, she overcharged everything — raw, desperate, burning through her own channels.[/blood]
+
+The cascade fires. Weaker, unfocused, but enough. Bandits scatter.
+
+Garrick. At the gate. Alone. The spear finds him while you're on the ground.
+
+When you can stand again, two people are down. Garrick permanently. And Mara — barely conscious, her channels fried.
+
+[void]You failed to protect either of them. The resonators are dust. And the cost is carved into the ground at the gate.[/void]`,
+    effects: { corruption: 5, hp: -10, setFlag: { garrick_dead: true, mara_burnout: true, resonators_destroyed: true } },
+    choices: [ { text: '...', next: 'bandit_rout' } ],
+  },
+
+  backup_garrick_battle: {
     location: 'Elmridge — South Gate',
     scene: 'battle',
-    moodLabel: 'The Gap',
-    text: `You fill the gap beside Garrick. Shoulder to shoulder. Two people in a hole meant for five.
+    moodLabel: 'COMBAT — Holding the Gap',
+    text: `You fill the gap beside Garrick. Two against the flood.
 
-*"About time!"* Garrick roars, swinging his hammer into the nearest attacker.
+The bandits press in — swords, axes, shields. The gap is three meters wide and everything depends on holding it.`,
+    choices: [],
+  },
 
-You fight. Hard. {ELEMENT} blazes and Garrick hammers and the gap holds.
+  backup_garrick_battle_win: {
+    location: 'Elmridge — South Gate',
+    scene: 'battle',
+    moodLabel: 'The Gap Holds',
+    text: `Shoulder to shoulder, you and Garrick hold the gap. Bodies pile. The bandits can't push through.
 
-[blood]Behind you — Mara overcharges the resonators alone. One elderly woman, channeling everything she has into a cascade meant for two elementalists.
+[blood]Behind you — Mara overcharges the resonators alone. One elderly woman, channeling everything into a cascade meant for two elementalists.
 
 The pulse fires. Bandits scatter. The gate holds.
 
 Mara does not.[/blood]
 
-She collapses. Not unconscious — worse. Her eyes are open but *empty*. The mana channels in her body have burned out. Overcharged beyond recovery.
+She collapses. Not unconscious — worse. Her eyes are open but *empty*. The mana channels in her body have burned out.
 
-[void]*Mana Burnout.* You've heard the term — the serpent's knowledge included it. When an elementalist pushes past their limits, the channels that carry elemental energy scar shut. Permanently.
+[void]*Mana Burnout.* When an elementalist pushes past their limits, the channels that carry elemental energy scar shut. Permanently.
 
 Mara will never channel again. Her Light element is gone. Not depleted — destroyed.[/void]
 
 Garrick reaches her first. The sound he makes when he realizes what happened is something you'll carry forever.`,
     effects: { corruption: 2, resolve: 1, setFlag: { mara_burnout: true, resonators_destroyed: true } },
     choices: [ { text: 'The battle isn\'t over.', next: 'bandit_rout' } ],
+  },
+
+  backup_garrick_battle_lose: {
+    location: 'Elmridge — South Gate',
+    scene: 'battle',
+    moodLabel: 'Broken',
+    text: `The gap breaks. An axe catches Garrick's leg. You take a sword across the ribs. The line collapses.
+
+[blood]Mara sees it happen. She doesn't hesitate — overcharges alone, burning through everything she has. The pulse is ragged, desperate, barely enough.[/blood]
+
+Bandits scatter. But Garrick's leg is shattered. And Mara is on the ground, eyes open and empty. Burned out.
+
+[void]The gap you tried to hold broke anyway. And Mara paid the price for doing your job.[/void]`,
+    effects: { corruption: 3, hp: -15, setFlag: { mara_burnout: true, garrick_crippled: true, resonators_destroyed: true } },
+    choices: [ { text: '...', next: 'bandit_rout' } ],
   },
 
   mara_resonator_sacrifice: {
@@ -1725,5 +1872,85 @@ You walk.[/void]`,
     }
 
     origRender.call(EV, sceneObj);
+
+    // Second wave battle (chose to keep fighting)
+    if (key === 'second_wave_battle' && !EV.state.flags._second_wave_fought) {
+      EV.state.flags._second_wave_fought = true;
+      setTimeout(function() {
+        var trapped = EV.state.flags.set_traps;
+        EV.startBattle({
+          enemy: {
+            name: 'Broken Fang Lieutenant',
+            hp: trapped ? 55 : 75, atk: 10, atkVar: 5, defense: 5,
+            intro: trapped ? 'The lieutenant stumbles through traps — weakened but furious.' : 'Shield raised, the lieutenant charges.',
+            abilityChance: 0.25,
+            ability: function(state) {
+              var msgs = [
+                { msg: 'Shield bash — your vision whites out!', damage: 14 },
+                { msg: 'She rallies her troops — coordinated push!', damage: 16 },
+                { msg: 'A feint, then a stab under your guard!', damage: 12 },
+              ];
+              return msgs[Math.floor(Math.random() * msgs.length)];
+            },
+          },
+          onWin: function() { EV.navigateTo('second_wave_win'); },
+          onLose: function() { EV.navigateTo('second_wave_lose'); },
+          canFlee: false,
+        });
+      }, 500);
+      return;
+    }
+
+    // Backup Mara defense battle
+    if (key === 'backup_mara_battle' && !EV.state.flags._mara_defense_fought) {
+      EV.state.flags._mara_defense_fought = true;
+      setTimeout(function() {
+        EV.startBattle({
+          enemy: {
+            name: 'Fang Vanguard',
+            hp: 50, atk: 9, atkVar: 4, defense: 3,
+            intro: 'Three bandits rush Mara. Hold them off!',
+            abilityChance: 0.2,
+            ability: function(state) {
+              var msgs = [
+                { msg: 'One breaks past you toward Mara — you barely intercept!', damage: 13 },
+                { msg: 'Two bandits press from both sides!', damage: 11 },
+              ];
+              return msgs[Math.floor(Math.random() * msgs.length)];
+            },
+          },
+          onWin: function() { EV.navigateTo('backup_mara_battle_win'); },
+          onLose: function() { EV.navigateTo('backup_mara_battle_lose'); },
+          canFlee: false,
+        });
+      }, 500);
+      return;
+    }
+
+    // Backup Garrick defense battle
+    if (key === 'backup_garrick_battle' && !EV.state.flags._garrick_defense_fought) {
+      EV.state.flags._garrick_defense_fought = true;
+      setTimeout(function() {
+        EV.startBattle({
+          enemy: {
+            name: 'Fang Breach Team',
+            hp: 55, atk: 10, atkVar: 5, defense: 4,
+            intro: 'Garrick at your side. The breach team charges.',
+            abilityChance: 0.25,
+            ability: function(state) {
+              var msgs = [
+                { msg: 'An axe-wielder barrels through — heavy strike!', damage: 14 },
+                { msg: 'They push together — the gap nearly breaks!', damage: 12 },
+              ];
+              return msgs[Math.floor(Math.random() * msgs.length)];
+            },
+          },
+          onWin: function() { EV.navigateTo('backup_garrick_battle_win'); },
+          onLose: function() { EV.navigateTo('backup_garrick_battle_lose'); },
+          canFlee: false,
+        });
+      }, 500);
+      return;
+    }
   };
 })();
